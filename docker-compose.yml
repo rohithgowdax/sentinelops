@@ -1,0 +1,103 @@
+services:
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sentinelops
+      POSTGRES_PASSWORD: sentinelops
+      POSTGRES_DB: sentinelops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinelops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── Application services ────────────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sentinelops-worker
+    environment:
+      SENTINELOPS_REDIS_URL: redis://redis:6379/0
+      SENTINELOPS_POSTGRES_DSN: postgresql+asyncpg://sentinelops:sentinelops@postgres:5432/sentinelops
+      SENTINELOPS_DETECTION_RULES_PATH: /app/config/detection_rules.yaml
+      SENTINELOPS_LOG_LEVEL: INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  detector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sentinelops-detector
+    environment:
+      SENTINELOPS_REDIS_URL: redis://redis:6379/0
+      SENTINELOPS_POSTGRES_DSN: postgresql+asyncpg://sentinelops:sentinelops@postgres:5432/sentinelops
+      SENTINELOPS_DETECTION_RULES_PATH: /app/config/detection_rules.yaml
+      SENTINELOPS_DETECTION_INTERVAL_SECONDS: "10"
+      SENTINELOPS_LOG_LEVEL: INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sentinelops-api
+    environment:
+      SENTINELOPS_REDIS_URL: redis://redis:6379/0
+      SENTINELOPS_POSTGRES_DSN: postgresql+asyncpg://sentinelops:sentinelops@postgres:5432/sentinelops
+      SENTINELOPS_API_HOST: 0.0.0.0
+      SENTINELOPS_API_PORT: "8000"
+      SENTINELOPS_LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sentinelops-simulator
+    environment:
+      SENTINELOPS_REDIS_URL: redis://redis:6379/0
+      SENTINELOPS_POSTGRES_DSN: postgresql+asyncpg://sentinelops:sentinelops@postgres:5432/sentinelops
+      SENTINELOPS_LOG_LEVEL: INFO
+    depends_on:
+      worker:
+        condition: service_started
+      detector:
+        condition: service_started
+    profiles:
+      - demo
+
+volumes:
+  postgres_data:

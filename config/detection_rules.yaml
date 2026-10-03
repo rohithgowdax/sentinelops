@@ -1,0 +1,71 @@
+# SentinelOps Detection Rules — Slice 1 POC
+#
+# Rules are evaluated periodically by the DetectionLoop against canonical
+# telemetry stored in the OperationalStore. The core engine never inspects
+# which adapter produced the data — it only reads canonical metric fields.
+#
+# Schema:
+#   rule_id:         stable unique identifier (never reuse or rename)
+#   name:            human-readable description
+#   signal:          "metric" (only type supported in slice 1)
+#   metric:          canonical metric name (must match adapter normalisation)
+#   operator:        gt | gte | lt | lte | eq
+#   threshold:       numeric boundary value (in canonical units)
+#   window_seconds:  look-back window for data collection
+#   severity:        low | medium | high | critical
+#   service_filter:  scope this rule to one service name (required in slice 1)
+#   environment:     optional environment scope (null = all)
+#   aggregation:     latest | mean | max | min (default: latest)
+#   enabled:         true | false
+#   description:     human-readable explanation
+
+rules:
+  - rule_id: rule-001-elevated-service-errors
+    name: Elevated Service Error Rate
+    description: >
+      Fires when the canonical http.error_rate metric for a service exceeds
+      10% (0.10 ratio) in the most recent sample within a 60-second window.
+      Threshold expressed as a ratio (0.0–1.0) because CustomJsonAdapter
+      normalises percent values to this unit.
+    signal: metric
+    metric: http.error_rate
+    operator: gt
+    threshold: 0.10
+    window_seconds: 60
+    severity: critical
+    service_filter: payments-service
+    environment: null
+    aggregation: latest
+    enabled: true
+
+  - rule_id: rule-002-high-latency-p99
+    name: High P99 Latency
+    description: >
+      Fires when http.latency.p99 exceeds 300ms for the payments service.
+      Latency is stored in milliseconds (canonical unit: ms).
+    signal: metric
+    metric: http.latency.p99
+    operator: gt
+    threshold: 300.0
+    window_seconds: 60
+    severity: high
+    service_filter: payments-service
+    environment: null
+    aggregation: latest
+    enabled: true
+
+  - rule_id: rule-003-mean-error-rate-critical
+    name: Sustained Mean Error Rate Critical
+    description: >
+      Fires when the mean error rate over the last 120 seconds exceeds 15%.
+      Uses mean aggregation for sustained-condition detection.
+    signal: metric
+    metric: http.error_rate
+    operator: gt
+    threshold: 0.15
+    window_seconds: 120
+    severity: critical
+    service_filter: payments-service
+    environment: null
+    aggregation: mean
+    enabled: true
