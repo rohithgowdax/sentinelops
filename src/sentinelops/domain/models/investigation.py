@@ -120,6 +120,7 @@ class InvestigationEvidence(BaseModel):
         description="Target service or resource name.",
     )
     signal: str = Field(
+        default="",
         description="Metric name or signal investigated.",
     )
     observation: dict[str, Any] = Field(
@@ -134,6 +135,40 @@ class InvestigationEvidence(BaseModel):
         default=None,
         description="Audit trace link to specific TelemetryRecord or event ID.",
     )
+    # Slice 3 Knowledge-Grounding extensions
+    kind: str = Field(
+        default="telemetry",
+        description="Evidence category ('telemetry', 'knowledge', 'log', 'trace', 'change').",
+    )
+    document_id: str | None = Field(
+        default=None,
+        description="Knowledge document identifier if source is knowledge.",
+    )
+    chunk_id: str | None = Field(
+        default=None,
+        description="Knowledge chunk identifier if source is knowledge.",
+    )
+    source: str | None = Field(
+        default=None,
+        description="Document source or filepath if source is knowledge.",
+    )
+    document_type: str | None = Field(
+        default=None,
+        description="Document classification (runbook, postmortem, etc.).",
+    )
+    retrieval_score: float | None = Field(
+        default=None,
+        description="Search score from vector/hybrid retrieval.",
+    )
+    rank: int | None = Field(
+        default=None,
+        description="Rank position in search results.",
+    )
+    content_snippet: str | None = Field(
+        default=None,
+        description="Excerpt or snippet of the retrieved text.",
+    )
+
 
 
 class Hypothesis(BaseModel):
@@ -207,6 +242,24 @@ class Diagnosis(BaseModel):
         default_factory=list,
         description="Non-executable advisory actions recommended for recovery.",
     )
+    # Slice 3 Knowledge Grounding extensions
+    observed_evidence: list[str] = Field(
+        default_factory=list,
+        description="Observed telemetry evidence IDs supporting diagnosis.",
+    )
+    knowledge_evidence: list[str] = Field(
+        default_factory=list,
+        description="Knowledge base evidence IDs supporting diagnosis.",
+    )
+    reasoning_summary: str = Field(
+        default="",
+        description="Concise structured rationale explaining deduction.",
+    )
+    uncertainties: list[str] = Field(
+        default_factory=list,
+        description="Remaining operational uncertainties.",
+    )
+
 
 
 class VerificationResult(BaseModel):
@@ -280,10 +333,28 @@ class InvestigationResult(BaseModel):
         default_factory=list,
         description="Structured evidence items gathered during investigation.",
     )
+    # Slice 3 Knowledge Grounding extensions
+    telemetry_evidence: list[InvestigationEvidence] = Field(
+        default_factory=list,
+        description="Live telemetry evidence items gathered.",
+    )
+    knowledge_evidence: list[InvestigationEvidence] = Field(
+        default_factory=list,
+        description="Organizational knowledge evidence items gathered.",
+    )
+    retrieval_queries: list[str] = Field(
+        default_factory=list,
+        description="Knowledge queries executed during investigation.",
+    )
+    retrieval_mode: str | None = Field(
+        default=None,
+        description="Mode used for knowledge retrieval.",
+    )
     investigation_steps: list[InvestigationStep] = Field(
         default_factory=list,
         description="Executed investigation steps.",
     )
+
     tool_calls_summary: list[dict[str, Any]] = Field(
         default_factory=list,
         description="Summary of tool queries executed.",

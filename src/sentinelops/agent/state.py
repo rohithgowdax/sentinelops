@@ -63,3 +63,9 @@ class InvestigationState(TypedDict):
     tool_calls_summary: list[dict[str, Any]]
     start_time_iso: str
     final_result: InvestigationResult | None
+    # Slice 3 Knowledge Grounding extensions
+    evidence_groups: dict[str, list[InvestigationEvidence]]
+    knowledge_queries: list[str]
+    knowledge_available: bool
+    retrieval_mode: str
+

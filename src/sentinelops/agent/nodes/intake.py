@@ -61,4 +61,9 @@ def incident_intake(state: InvestigationState) -> dict[str, Any]:
         "errors": state.get("errors") or [],
         "tool_calls_summary": state.get("tool_calls_summary") or [],
         "start_time_iso": now_iso,
+        "evidence_groups": state.get("evidence_groups") or {"telemetry": [], "knowledge": []},
+        "knowledge_queries": state.get("knowledge_queries") or [],
+        "knowledge_available": state.get("knowledge_available", True),
+        "retrieval_mode": state.get("retrieval_mode") or "hybrid",
     }
+

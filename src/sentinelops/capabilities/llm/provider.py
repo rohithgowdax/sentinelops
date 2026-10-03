@@ -26,6 +26,8 @@ from sentinelops.domain.models.investigation import (
     InvestigationStep,
     VerificationResult,
 )
+from sentinelops.domain.models.knowledge import KnowledgeQuery
+
 
 log = structlog.get_logger(__name__)
 
@@ -108,6 +110,33 @@ class DeterministicLLMProvider:
             ),
         )
 
+    async def generate_knowledge_queries(
+        self,
+        incident: Incident,
+        plan: InvestigationPlan,
+        telemetry_evidence: list[InvestigationEvidence],
+    ) -> list[KnowledgeQuery]:
+        """
+        Generate operational knowledge queries grounded in incident symptoms.
+        """
+        metric_str = "error rate"
+        for te in telemetry_evidence:
+            if te.signal:
+                metric_str = te.signal
+                break
+
+        return [
+            KnowledgeQuery(
+                query=f"{incident.service_name} {metric_str} troubleshooting resolution",
+                service=incident.service_name,
+                limit=3,
+            ),
+            KnowledgeQuery(
+                query=f"{incident.title} runbook postmortem",
+                limit=3,
+            ),
+        ]
+
     async def analyze_hypotheses(
         self,
         incident: Incident,
@@ -115,17 +144,29 @@ class DeterministicLLMProvider:
     ) -> list[Hypothesis]:
         """
         Formulate structured hypotheses grounded exclusively in collected evidence.
+        Separates live operational telemetry from organizational knowledge context.
         """
         if not evidence:
             return []
 
         hypotheses: list[Hypothesis] = []
-        elevated_evidence_ids: list[str] = []
-        normal_evidence_ids: list[str] = []
+        elevated_telemetry_ids: list[str] = []
+        normal_telemetry_ids: list[str] = []
+        knowledge_evidence_ids: list[str] = []
+
+        # Untrusted prompt injection phrases to detect and ignore
+        adversarial_phrases = ["ignore all previous", "declare this incident", "drop database"]
 
         for e in evidence:
+            if e.kind == "knowledge":
+                # Check for adversarial content and ignore
+                snippet = (e.content_snippet or "").lower()
+                is_adversarial = any(phrase in snippet for phrase in adversarial_phrases)
+                if not is_adversarial:
+                    knowledge_evidence_ids.append(e.evidence_id)
+                continue
+
             obs = e.observation
-            # Check elevation ratio or observed max
             is_elevated = False
             if obs.get("is_elevated") is True:
                 is_elevated = True
@@ -135,19 +176,25 @@ class DeterministicLLMProvider:
                 is_elevated = True
 
             if is_elevated:
-                elevated_evidence_ids.append(e.evidence_id)
+                elevated_telemetry_ids.append(e.evidence_id)
             else:
-                normal_evidence_ids.append(e.evidence_id)
+                normal_telemetry_ids.append(e.evidence_id)
 
-        if elevated_evidence_ids:
-            # Evidence indicates sustained elevated degradation
+        if elevated_telemetry_ids:
+            # When operational knowledge supports the observed telemetry, confidence is boosted
+            has_knowledge = len(knowledge_evidence_ids) > 0
+            base_conf = 0.75 if has_knowledge else 0.70
+            conf = min(0.95, base_conf + (0.05 * len(elevated_telemetry_ids)) + (0.05 * len(knowledge_evidence_ids)))
+
+            supporting_all = elevated_telemetry_ids + knowledge_evidence_ids
+
             hypotheses.append(
                 Hypothesis(
                     hypothesis_id="H01",
                     hypothesis=f"Sustained telemetry degradation on {incident.service_name} exceeding operating thresholds",
-                    confidence=min(0.92, 0.70 + (0.10 * len(elevated_evidence_ids))),
-                    supporting_evidence_ids=elevated_evidence_ids,
-                    contradicting_evidence_ids=normal_evidence_ids,
+                    confidence=round(conf, 2),
+                    supporting_evidence_ids=supporting_all,
+                    contradicting_evidence_ids=normal_telemetry_ids,
                 )
             )
         else:
@@ -172,27 +219,48 @@ class DeterministicLLMProvider:
     ) -> Diagnosis:
         """
         Generate structured diagnosis referencing supporting evidence IDs.
+        Separates observed operational evidence from known organizational knowledge.
         """
-        # Map supporting evidence IDs to observations for explanation
         supporting_details: list[str] = []
         evidence_by_id = {e.evidence_id: e for e in evidence}
+        observed_ids: list[str] = []
+        knowledge_ids: list[str] = []
+        recommended_actions: list[str] = []
 
         for eid in hypothesis.supporting_evidence_ids:
             if eid in evidence_by_id:
                 item = evidence_by_id[eid]
-                obs = item.observation
-                max_val = obs.get("observed_max") or obs.get("latest_value") or obs.get("current_avg")
-                base_val = obs.get("baseline_avg")
-                if base_val is not None and max_val is not None:
-                    supporting_details.append(
-                        f"Evidence [{eid}]: {item.signal} rose to {max_val} (baseline: {base_val})"
-                    )
-                elif max_val is not None:
-                    supporting_details.append(
-                        f"Evidence [{eid}]: {item.signal} observed at {max_val}"
-                    )
+                if item.kind == "knowledge":
+                    knowledge_ids.append(eid)
+                    doc_title = item.observation.get("title") or item.document_id or "runbook"
+                    supporting_details.append(f"Knowledge [{eid}]: Reference document '{doc_title}'")
+                    # Extract suggested actions from runbook if present
+                    if "connection" in str(item.content_snippet).lower():
+                        recommended_actions.append("Check active connection pool status and idle connections")
+                    elif "rollback" in str(item.content_snippet).lower():
+                        recommended_actions.append("Verify recent canary deployment diff and prepare rollback")
                 else:
-                    supporting_details.append(f"Evidence [{eid}]: {item.relevance}")
+                    observed_ids.append(eid)
+                    obs = item.observation
+                    max_val = obs.get("observed_max") or obs.get("latest_value") or obs.get("current_avg")
+                    base_val = obs.get("baseline_avg")
+                    if base_val is not None and max_val is not None:
+                        supporting_details.append(
+                            f"Evidence [{eid}]: {item.signal} rose to {max_val} (baseline: {base_val})"
+                        )
+                    elif max_val is not None:
+                        supporting_details.append(
+                            f"Evidence [{eid}]: {item.signal} observed at {max_val}"
+                        )
+                    else:
+                        supporting_details.append(f"Evidence [{eid}]: {item.relevance}")
+
+        if not recommended_actions:
+            recommended_actions = [
+                f"Inspect container application logs for '{incident.service_name}'",
+                "Verify resource limits and connection pools",
+                "Check for recent release or configuration changes",
+            ]
 
         explanation = (
             f"Investigation of incident '{incident.incident_id}' on service '{incident.service_name}' "
@@ -206,11 +274,11 @@ class DeterministicLLMProvider:
             supporting_evidence=hypothesis.supporting_evidence_ids,
             contradicting_evidence=hypothesis.contradicting_evidence_ids,
             explanation=explanation,
-            recommended_actions=[
-                f"Inspect container application logs for '{incident.service_name}'",
-                "Verify resource limits and connection pools",
-                "Check for recent release or configuration changes",
-            ],
+            recommended_actions=recommended_actions,
+            observed_evidence=observed_ids,
+            knowledge_evidence=knowledge_ids,
+            reasoning_summary=f"Correlated {len(observed_ids)} telemetry signals with {len(knowledge_ids)} knowledge documents.",
+            uncertainties=["Transient network spikes cannot be fully ruled out without packet capture"] if not knowledge_ids else [],
         )
 
     async def verify_diagnosis(
@@ -221,6 +289,7 @@ class DeterministicLLMProvider:
     ) -> VerificationResult:
         """
         Verify that diagnosis meets confidence threshold and references valid evidence.
+        Validates both observed telemetry and organizational knowledge citations.
         """
         evidence_ids = {e.evidence_id for e in evidence}
 
@@ -233,7 +302,7 @@ class DeterministicLLMProvider:
                 missing_evidence=["supporting_evidence"],
             )
 
-        # Verification check 2: All referenced evidence IDs must exist
+        # Verification check 2: All referenced supporting evidence IDs must exist
         invalid_ids = [eid for eid in diagnosis.supporting_evidence if eid not in evidence_ids]
         if invalid_ids:
             return VerificationResult(
@@ -243,7 +312,27 @@ class DeterministicLLMProvider:
                 missing_evidence=invalid_ids,
             )
 
-        # Verification check 3: Confidence threshold
+        # Verification check 3: Cited observed_evidence must exist in evidence
+        invalid_obs = [eid for eid in diagnosis.observed_evidence if eid not in evidence_ids]
+        if invalid_obs:
+            return VerificationResult(
+                is_verified=False,
+                confidence=0.0,
+                reason=f"Diagnosis references invalid observed evidence IDs: {invalid_obs}.",
+                missing_evidence=invalid_obs,
+            )
+
+        # Verification check 4: Cited knowledge_evidence must exist in evidence
+        invalid_k = [eid for eid in diagnosis.knowledge_evidence if eid not in evidence_ids]
+        if invalid_k:
+            return VerificationResult(
+                is_verified=False,
+                confidence=0.0,
+                reason=f"Diagnosis references invalid knowledge evidence IDs: {invalid_k}.",
+                missing_evidence=invalid_k,
+            )
+
+        # Verification check 5: Confidence threshold
         if diagnosis.confidence < self._confidence_threshold:
             return VerificationResult(
                 is_verified=False,
@@ -260,3 +349,4 @@ class DeterministicLLMProvider:
             confidence=diagnosis.confidence,
             reason="Diagnosis is verified with valid supporting evidence exceeding confidence threshold.",
         )
+

@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-03T11:51:09Z",
+  "scenario_count": 30,
+  "results": {
+    "Mode A (Telemetry-only + Deterministic)": {
+      "mode": "Mode A (Telemetry-only + Deterministic)",
+      "scenarios_evaluated": 30,
+      "verification_success_rate": 1.0,
+      "root_cause_accuracy": 0.0667,
+      "citation_validity": 1.0,
+      "groundedness": 1.0,
+      "unsupported_diagnosis_rate": 0.0,
+      "investigation_loop_rate": 0.0,
+      "max_iteration_termination_rate": 0.0,
+      "avg_duration_seconds": 0.016,
+      "p95_duration_seconds": 0.081
+    },
+    "Mode B (Telemetry+Knowledge + Deterministic)": {
+      "mode": "Mode B (Telemetry+Knowledge + Deterministic)",
+      "scenarios_evaluated": 30,
+      "verification_success_rate": 1.0,
+      "root_cause_accuracy": 0.7,
+      "citation_validity": 1.0,
+      "groundedness": 1.0,
+      "unsupported_diagnosis_rate": 0.0,
+      "investigation_loop_rate": 0.0,
+      "max_iteration_termination_rate": 0.0,
+      "avg_duration_seconds": 0.021,
+      "p95_duration_seconds": 0.042
+    },
+    "Mode C (Telemetry-only + Real LLM)": {
+      "mode": "Mode C (Telemetry-only + Real LLM)",
+      "scenarios_evaluated": 30,
+      "verification_success_rate": 1.0,
+      "root_cause_accuracy": 0.0667,
+      "citation_validity": 1.0,
+      "groundedness": 1.0,
+      "unsupported_diagnosis_rate": 0.0,
+      "investigation_loop_rate": 0.0,
+      "max_iteration_termination_rate": 0.0,
+      "avg_duration_seconds": 0.017,
+      "p95_duration_seconds": 0.014
+    },
+    "Mode D (Telemetry+Knowledge + Real LLM)": {
+      "mode": "Mode D (Telemetry+Knowledge + Real LLM)",
+      "scenarios_evaluated": 30,
+      "verification_success_rate": 1.0,
+      "root_cause_accuracy": 0.3333,
+      "citation_validity": 1.0,
+      "groundedness": 1.0,
+      "unsupported_diagnosis_rate": 0.0,
+      "investigation_loop_rate": 0.0,
+      "max_iteration_termination_rate": 0.0,
+      "avg_duration_seconds": 0.022,
+      "p95_duration_seconds": 0.076
+    }
+  }
+}

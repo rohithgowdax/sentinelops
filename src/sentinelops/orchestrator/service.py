@@ -35,7 +35,11 @@ from sentinelops.agent.graph import create_investigation_graph
 from sentinelops.agent.state import InvestigationState
 from sentinelops.capabilities.evidence.telemetry_evidence import PostgresTelemetryEvidenceProvider
 from sentinelops.capabilities.llm.provider import DeterministicLLMProvider
-from sentinelops.domain.contracts.protocols import LLMProvider, TelemetryEvidenceProvider
+from sentinelops.domain.contracts.protocols import (
+    KnowledgeProvider,
+    LLMProvider,
+    TelemetryEvidenceProvider,
+)
 from sentinelops.domain.models.incident import Incident
 from sentinelops.domain.models.investigation import (
     InvestigationResult,
@@ -58,6 +62,7 @@ class OrchestratorService:
         store: PostgresOperationalStore,
         evidence_provider: TelemetryEvidenceProvider | None = None,
         llm_provider: LLMProvider | None = None,
+        knowledge_provider: KnowledgeProvider | None = None,
         consumer_group: str = "sentinelops-orchestrator",
         consumer_name: str = "orchestrator-1",
         batch_size: int = 5,
@@ -71,6 +76,7 @@ class OrchestratorService:
             store: PostgresOperationalStore instance for persisting investigation results.
             evidence_provider: Evidence capability (defaults to PostgresTelemetryEvidenceProvider).
             llm_provider: LLM provider (defaults to DeterministicLLMProvider).
+            knowledge_provider: Optional knowledge capability.
             consumer_group: Redis consumer group name.
             consumer_name: Consumer worker name.
             batch_size: Number of incidents to consume per batch.
@@ -80,6 +86,7 @@ class OrchestratorService:
         self._store = store
         self._evidence_provider = evidence_provider or PostgresTelemetryEvidenceProvider(store)
         self._llm_provider = llm_provider or DeterministicLLMProvider()
+        self._knowledge_provider = knowledge_provider
         self._group = consumer_group
         self._consumer = consumer_name
         self._batch = batch_size
@@ -93,8 +100,10 @@ class OrchestratorService:
         self._graph = create_investigation_graph(
             evidence_provider=self._evidence_provider,
             llm_provider=self._llm_provider,
+            knowledge_provider=self._knowledge_provider,
             checkpointer=self._checkpointer,
         )
+
 
     async def run(self) -> None:
         """

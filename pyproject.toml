@@ -24,6 +24,7 @@ dependencies = [
     "anyio>=4.4,<5",
     "langgraph>=0.2,<2",
     "langchain-core>=0.3,<2",
+    "qdrant-client>=1.13.0,<2",
 ]
 
 [project.optional-dependencies]
@@ -45,6 +46,10 @@ sentinelops-detector = "sentinelops.detection.runner:main"
 sentinelops-api = "sentinelops.api.main:main"
 sentinelops-simulator = "sentinelops.simulator.runner:main"
 sentinelops-orchestrator = "sentinelops.orchestrator.runner:main"
+sentinelops-ingest-knowledge = "sentinelops.knowledge.ingest:main"
+sentinelops-eval-retrieval = "sentinelops.evals.run_retrieval_eval:main"
+sentinelops-eval-llm = "sentinelops.evals.run_llm_eval:main"
+
 
 [build-system]
 requires = ["setuptools>=70", "setuptools-scm>=8"]

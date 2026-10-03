@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-10-03T11:48:33Z",
+  "collection": "sentinelops_knowledge",
+  "query_count": 50,
+  "results": {
+    "dense_only": {
+      "mode": "dense_only",
+      "query_count": 50,
+      "recall_at_5": 0.74,
+      "mrr": 0.8392,
+      "ndcg_at_10": 1.6118,
+      "avg_latency_ms": 3.45,
+      "p95_latency_ms": 7.93
+    },
+    "sparse_only": {
+      "mode": "sparse_only",
+      "query_count": 50,
+      "recall_at_5": 0.74,
+      "mrr": 0.8392,
+      "ndcg_at_10": 1.6118,
+      "avg_latency_ms": 2.62,
+      "p95_latency_ms": 3.65
+    },
+    "hybrid": {
+      "mode": "hybrid",
+      "query_count": 50,
+      "recall_at_5": 0.74,
+      "mrr": 0.8392,
+      "ndcg_at_10": 1.6118,
+      "avg_latency_ms": 5.13,
+      "p95_latency_ms": 9.7
+    },
+    "hybrid_plus_rerank": {
+      "mode": "hybrid_plus_rerank",
+      "query_count": 50,
+      "recall_at_5": 0.78,
+      "mrr": 0.829,
+      "ndcg_at_10": 1.6842,
+      "avg_latency_ms": 4.0,
+      "p95_latency_ms": 6.96
+    }
+  }
+}

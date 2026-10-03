@@ -108,16 +108,40 @@ The `evaluate_rule()` function operates exclusively on `TelemetryRecord` fields:
 
 It never accesses `record.source.provider`. If it did, the contract test `test_detector_does_not_inspect_provider` would fail because both adapters produce different provider values but must produce the same detection outcome.
 
+## Agent Investigation Generalization (Slice 2)
+
+In Slice 2, SentinelOps extended provider neutrality to the AI investigation layer. The LangGraph agent consumes canonical `Incident` objects and queries operational telemetry solely through the `TelemetryEvidenceProvider` capability protocol:
+
+```python
+class TelemetryEvidenceProvider(Protocol):
+    async def query_recent_telemetry(self, resource: str, metric: str, window_seconds: int = 300) -> dict[str, Any]: ...
+    async def compare_telemetry_baseline(self, resource: str, metric: str, current_window: int = 300, baseline_window: int = 3600) -> dict[str, Any]: ...
+    async def get_incident_trigger_context(self, incident: Incident) -> dict[str, Any]: ...
+```
+
+The LangGraph investigation loop contains zero branches on incident sources or telemetry origins, proven via automated AST parsing.
+
+## Knowledge Capability Generalization (Slice 3)
+
+In Slice 3, organizational knowledge retrieval was introduced without coupling the core agent to any vector database vendor. The agent communicates with knowledge repositories exclusively through the `KnowledgeProvider` capability protocol:
+
+```python
+class KnowledgeProvider(Protocol):
+    async def search(self, query: KnowledgeQuery) -> list[KnowledgeResult]: ...
+    async def index_chunks(self, chunks: list[KnowledgeChunk]) -> int: ...
+```
+
+### Knowledge Generalization Invariants
+1. **Zero Vector DB Imports in Agent:** Agent nodes, prompts, state, and graph never import `qdrant_client`, `chromadb`, `pymilvus`, `pinecone`, or LLM vendor SDKs.
+2. **Provider Interchangeability:** Both `InMemoryKnowledgeProvider` (zero-dependency for CI/offline testing) and `QdrantKnowledgeProvider` (production vector store) implement the identical protocol and produce identical canonical `KnowledgeResult` structures.
+3. **Canonical Evidence Grounding:** Telemetry evidence (`kind="metric"`) and knowledge evidence (`kind="runbook"`, `"postmortem"`, etc.) are both normalized into `InvestigationEvidence` records with explicit citation provenance (`document_id`, `chunk_id`, `source`, `retrieval_score`, `rank`, `content_snippet`).
+4. **Graceful Fallback:** If the vector database or knowledge service fails, the agent continues investigation using live operational telemetry without failing.
+
 ## Architectural Invariants
 
-1. **No provider branching in the core.** The only permitted location for provider-specific logic is in an adapter's `normalize()` method.
-2. **Adapters are stateless.** Each `normalize()` call is independent with no shared mutable state.
-3. **Canonical models are the API surface.** The EventBus, OperationalStore, and Detection Engine only accept and return canonical types.
-4. **Raw payload is preserved.** The `raw_payload` field retains the original external data for debugging without affecting business logic.
-5. **New providers require only a new adapter.** No changes to detection, storage, or API code are required.
+1. **No provider branching in the core.** The only permitted location for provider-specific logic is in an adapter or integration provider.
+2. **Adapters and Providers are stateless.** Normalization and retrieval operations do not leak mutable cross-request state.
+3. **Canonical models are the API surface.** EventBus, OperationalStore, Detection Engine, LangGraph, and Knowledge Subsystem communicate strictly in canonical types.
+4. **Raw payload and provenance are preserved.** Raw payloads and chunk snippets are preserved for auditing without leaking vendor coupling into business logic.
+5. **New providers require zero core modification.** Adding a new telemetry source requires only a `TelemetryAdapter`; adding a new vector store requires only a `KnowledgeProvider`.
 
-## Limitations in Slice 1
-
-- Adapters are registered manually (injected at startup). Future slices will add a plugin/discovery mechanism.
-- Metric name mapping table in Adapter B is hardcoded. Future slices may load from configuration.
-- Only metric signals are handled. Log and trace adapters are designed but not yet implemented.

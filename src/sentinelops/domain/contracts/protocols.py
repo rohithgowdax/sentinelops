@@ -20,7 +20,13 @@ from sentinelops.domain.models.events import (
     TelemetryReceivedEvent,
 )
 from sentinelops.domain.models.incident import Incident
+from sentinelops.domain.models.knowledge import (
+    KnowledgeChunk,
+    KnowledgeQuery,
+    KnowledgeResult,
+)
 from sentinelops.domain.models.telemetry import TelemetryRecord
+
 
 
 @runtime_checkable
@@ -309,6 +315,93 @@ class TelemetryEvidenceProvider(Protocol):
 
 
 @runtime_checkable
+class KnowledgeProvider(Protocol):
+    """
+    Capability protocol for searching and querying organizational knowledge.
+
+    Invariants:
+    - Provider-neutral: callers request KnowledgeQuery, receiving canonical KnowledgeResult.
+    - Implementations handle vector DB indexing, sparse/dense search, filtering, and fusion.
+    """
+
+    async def search(
+        self,
+        query: KnowledgeQuery,
+    ) -> list[KnowledgeResult]:
+        """
+        Execute semantic and metadata-filtered search over operational knowledge.
+
+        Args:
+            query: Canonical `KnowledgeQuery`.
+
+        Returns:
+            List of `KnowledgeResult` items ordered by relevance score.
+        """
+        ...
+
+    async def index_chunks(
+        self,
+        chunks: list[KnowledgeChunk],
+    ) -> int:
+        """
+        Idempotently index knowledge chunks into the underlying storage engine.
+
+        Args:
+            chunks: List of canonical `KnowledgeChunk` items.
+
+        Returns:
+            Count of successfully indexed chunks.
+        """
+        ...
+
+
+@runtime_checkable
+class EmbeddingProvider(Protocol):
+    """
+    Protocol for generating dense vector representations for queries and documents.
+    """
+
+    @property
+    def dimension(self) -> int:
+        """Dimensionality of the output embedding vector."""
+        ...
+
+    async def embed_query(self, text: str) -> list[float]:
+        """Generate vector embedding for a single search query."""
+        ...
+
+    async def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        """Generate vector embeddings for a batch of documents/chunks."""
+        ...
+
+
+@runtime_checkable
+class RerankerProvider(Protocol):
+    """
+    Protocol for reranking candidate search results.
+    """
+
+    async def rerank(
+        self,
+        query: str,
+        results: list[KnowledgeResult],
+        top_k: int = 5,
+    ) -> list[KnowledgeResult]:
+        """
+        Rerank and filter candidate search results.
+
+        Args:
+            query: The search query string.
+            results: Candidate `KnowledgeResult` items.
+            top_k: Maximum number of reranked items to return.
+
+        Returns:
+            Reranked list of `KnowledgeResult` items.
+        """
+        ...
+
+
+@runtime_checkable
 class LLMProvider(Protocol):
     """
     Pluggable LLM provider abstraction for SentinelOps investigation nodes.
@@ -334,6 +427,26 @@ class LLMProvider(Protocol):
             `InvestigationPlan` domain model.
         """
         ...
+
+    async def generate_knowledge_queries(
+        self,
+        incident: Incident,
+        plan: Any,
+        telemetry_evidence: list[Any],
+    ) -> list[KnowledgeQuery]:
+        """
+        Generate targeted search queries for operational knowledge based on incident symptoms.
+
+        Args:
+            incident: Canonical `Incident`.
+            plan: Current `InvestigationPlan`.
+            telemetry_evidence: Collected live telemetry evidence.
+
+        Returns:
+            List of `KnowledgeQuery` objects to execute against KnowledgeProvider.
+        """
+        ...
+
 
     async def analyze_hypotheses(
         self,

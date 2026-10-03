@@ -67,12 +67,19 @@ def finalize(state: InvestigationState) -> dict[str, Any]:
             else "Investigation terminated without sufficient verified evidence."
         )
 
+    telemetry_ev = [e for e in evidence if getattr(e, "kind", "telemetry") != "knowledge"]
+    knowledge_ev = [e for e in evidence if getattr(e, "kind", "telemetry") == "knowledge"]
+
     result = InvestigationResult(
         incident_id=incident.incident_id,
         status=status,
         diagnosis=diag,
         confidence=confidence,
         supporting_evidence=evidence,
+        telemetry_evidence=telemetry_ev,
+        knowledge_evidence=knowledge_ev,
+        retrieval_queries=state.get("knowledge_queries") or [],
+        retrieval_mode=state.get("retrieval_mode"),
         investigation_steps=plan.steps if plan else [],
         tool_calls_summary=tool_calls,
         duration_seconds=round(duration, 3),
@@ -80,6 +87,7 @@ def finalize(state: InvestigationState) -> dict[str, Any]:
         failure_reason=failure_reason,
         completed_at=now,
     )
+
 
     log.info(
         "investigation.finalized",

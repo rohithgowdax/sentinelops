@@ -33,6 +33,14 @@ from sentinelops.domain.models.investigation import (
     InvestigationStep,
     VerificationResult,
 )
+from sentinelops.domain.models.knowledge import (
+    DocumentType,
+    KnowledgeChunk,
+    KnowledgeMetadata,
+    KnowledgeQuery,
+    KnowledgeResult,
+    RetrievalMode,
+)
 
 __all__ = [
     "TelemetryRecord",
@@ -59,4 +67,11 @@ __all__ = [
     "InvestigationStatus",
     "InvestigationStep",
     "VerificationResult",
+    "DocumentType",
+    "KnowledgeChunk",
+    "KnowledgeMetadata",
+    "KnowledgeQuery",
+    "KnowledgeResult",
+    "RetrievalMode",
 ]
+

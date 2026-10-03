@@ -98,6 +98,46 @@ class Settings(BaseSettings):
         default=2000, description="Redis block duration in ms for incident stream."
     )
 
+    # ── Qdrant & Knowledge Base Settings ──────────────────────────────────────
+    qdrant_url: str = Field(
+        default="http://localhost:6333",
+        description="Qdrant vector database URL.",
+    )
+    qdrant_api_key: str | None = Field(
+        default=None,
+        description="Optional Qdrant API key for authentication.",
+    )
+    qdrant_collection: str = Field(
+        default="sentinelops_knowledge",
+        description="Qdrant collection name for knowledge base.",
+    )
+    knowledge_dir: str = Field(
+        default="knowledge",
+        description="Path to knowledge documents directory.",
+    )
+    retrieval_mode: str = Field(
+        default="hybrid",
+        description="Default retrieval mode: dense_only, sparse_only, hybrid, hybrid_plus_rerank.",
+    )
+
+    # ── LLM Provider Settings ────────────────────────────────────────────────
+    llm_provider: str = Field(
+        default="deterministic",
+        description="Active LLM provider: 'deterministic' or 'real'.",
+    )
+    llm_model: str = Field(
+        default="gpt-4o-mini",
+        description="Model identifier for real LLM provider.",
+    )
+    llm_api_key: str | None = Field(
+        default=None,
+        description="Optional API key for real LLM provider.",
+    )
+    llm_base_url: str | None = Field(
+        default=None,
+        description="Optional base URL for real LLM provider endpoint.",
+    )
+
     # ── API Server Settings ───────────────────────────────────────────────────
     api_host: str = Field(
         default="0.0.0.0", description="Network host interface to bind API server."
@@ -105,6 +145,7 @@ class Settings(BaseSettings):
     api_port: int = Field(
         default=8000, description="Network port number for API server."
     )
+
 
 
 def get_settings() -> Settings:

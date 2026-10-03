@@ -185,6 +185,59 @@ Automated test `test_semantic_equivalence_across_sources`:
 
 ---
 
+## Part 6: Knowledge Capability Generalization Proof (Slice 3)
+
+The knowledge generalization tests in `tests/contract/test_knowledge_generalization.py` prove that the incident investigation agent remains completely decoupled from vector database technologies and gracefully handles retrieval outages.
+
+### Proof 1: Static AST Zero-Vector DB Coupling Analysis
+Automated test `test_zero_vector_db_imports_in_agent_ast` parses Python Abstract Syntax Trees across all agent files:
+- `src/sentinelops/agent/nodes/*.py`
+- `src/sentinelops/agent/graph.py`
+- `src/sentinelops/agent/state.py`
+- `src/sentinelops/agent/prompts.py`
+
+It verifies that no AST import node imports vendor vector packages:
+- `"qdrant_client"`, `"chromadb"`, `"pymilvus"`, `"openai"`, `"anthropic"`, `"google.generativeai"`
+
+Result: **0 vendor imports detected**.
+
+### Proof 2: Capability Protocol Conformance
+Automated test `test_knowledge_provider_protocol_conformance` verifies that both implementations:
+- `InMemoryKnowledgeProvider`
+- `QdrantKnowledgeProvider`
+satisfy the `KnowledgeProvider` Protocol at the class structure level via `issubclass()`.
+
+### Proof 3: Cross-Provider Canonical Result Equivalence
+Automated test `test_equivalent_canonical_results_across_providers`:
+1. Ingests identical test knowledge chunks into `InMemoryKnowledgeProvider` and `QdrantKnowledgeProvider` (`:memory:`).
+2. Executes identical `KnowledgeQuery(query="restart leaking worker pods connection slots", mode=RetrievalMode.DENSE_ONLY)`.
+3. Proves that both return identical canonical `KnowledgeResult` structures:
+   - `im_res.document_id == qd_res.document_id == "rb-db-001"`
+   - `im_res.chunk_id == qd_res.chunk_id == "CHK-EQUIV-01"`
+   - `im_res.document_type == qd_res.document_type == DocumentType.RUNBOOK`
+   - `im_res.title == qd_res.title == "Postgres Runbook"`
+   - `im_res.section == qd_res.section == "Resolution"`
+   - `im_res.service == qd_res.service == "payments-service"`
+   - `im_res.content == qd_res.content`
+
+### Proof 4: Graceful Degradation on Knowledge Failure
+Automated test `test_graceful_fallback_when_knowledge_unavailable`:
+1. Configures a `KnowledgeProvider` mock that raises `KnowledgeUnavailableError("Connection to vector DB timed out")`.
+2. Runs a full LangGraph investigation for a live incident.
+3. Proves that:
+   - The agent does not crash or exit with error.
+   - The investigation completes with `status == InvestigationStatus.DIAGNOSED`.
+   - The state records `knowledge_available = False` and logs the retrieval error.
+   - Diagnosis is successfully grounded in live operational telemetry.
+
+**Assertions verified by tests:**
+- `test_zero_vector_db_imports_in_agent_ast`: ✅ PASSED
+- `test_knowledge_provider_protocol_conformance`: ✅ PASSED
+- `test_equivalent_canonical_results_across_providers`: ✅ PASSED
+- `test_graceful_fallback_when_knowledge_unavailable`: ✅ PASSED
+
+---
+
 ## Summary
 
 | Proof Component | Test Count | Result |
@@ -195,23 +248,23 @@ Automated test `test_semantic_equivalence_across_sources`:
 | No provider-specific branching in detector | 2 | ✅ All passed |
 | Zero provider branching in Agent AST (Slice 2) | 1 | ✅ Passed |
 | Semantic equivalence across sources in Agent (Slice 2) | 1 | ✅ Passed |
-| **Total generalization contract tests** | **15** | **✅ 15/15 passed** |
+| Zero vector DB imports in Agent AST (Slice 3) | 1 | ✅ Passed |
+| KnowledgeProvider protocol conformance (Slice 3) | 1 | ✅ Passed |
+| Equivalent canonical knowledge results across stores (Slice 3) | 1 | ✅ Passed |
+| Graceful degradation on knowledge outage (Slice 3) | 1 | ✅ Passed |
+| **Total generalization contract tests** | **19** | **✅ 19/19 passed** |
 
 ---
 
 ## What This Proves About Architecture
 
-The generalization proof demonstrates that:
+The generalization proofs across Slices 1, 2, and 3 demonstrate that:
 
-1. **Adapter isolation is complete.** All provider-specific logic is contained within `normalize()`. Nothing leaks to the core.
+1. **Adapter isolation is complete.** All telemetry provider-specific logic is contained within `normalize()`.
+2. **Detection engine is provider-neutral by construction.** Operates exclusively on canonical types.
+3. **Agent reasoning is decoupled from storage and telemetry vendors.** Queries operational context solely via `TelemetryEvidenceProvider`.
+4. **Agent reasoning is decoupled from vector databases.** Communicates with organizational knowledge solely via `KnowledgeProvider`.
+5. **System is resilient to knowledge outages.** If Qdrant or external knowledge fails, the agent continues investigating using live telemetry without breaking state or crashing.
+6. **Adding new providers requires zero changes to core business logic.** Telemetry adapters and knowledge providers plug in cleanly behind standard interfaces.
 
-2. **Unit normalization works.** The 18% custom JSON value (0–100 scale) is correctly normalized to 0.18 (0–1 ratio) to match the OTel convention, enabling rule thresholds to be expressed once in canonical units.
-
-3. **The detection engine is provider-neutral by construction, not by convention.** The test verifies this structurally — different providers produce the same evaluation outcome because the function operates only on canonical fields.
-
-4. **Deduplication is provider-neutral.** A second incident would not be created even if one record came from OTel and another from the custom agent, because they share the same `episode_key`.
-
-5. **Agent reasoning is provider-neutral.** The LangGraph investigation loop reasons entirely over canonical domain abstractions and queries evidence through provider capability protocols (`TelemetryEvidenceProvider`). There are zero branches on telemetry sources anywhere in the agent codebase.
-
-6. **Adding a third provider requires zero changes to detection, investigation, storage, or API.** Only a new telemetry adapter and its unit tests are needed.
 
