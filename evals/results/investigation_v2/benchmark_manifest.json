@@ -1,0 +1,10 @@
+{
+  "benchmark_name": "sentinelops-incident-investigation-ablation",
+  "benchmark_version": "slice3-v2-hardened",
+  "dataset_version": "v2",
+  "timestamp": "2026-10-03T13:00:44Z",
+  "scenario_count": 60,
+  "provider_filter": "all",
+  "external_api_configured": false,
+  "evaluation_notice": "This benchmark is an engineering evaluation set, not a statistically representative estimate of production incident accuracy."
+}

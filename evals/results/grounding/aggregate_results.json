@@ -1,0 +1,17 @@
+{
+  "total_claims_evaluated": 120,
+  "factual_claims_count": 120,
+  "causal_claims_count": 0,
+  "citation_reference_validity_rate": 1.0,
+  "claim_support_rate": 1.0,
+  "claim_contradiction_rate": 0.0,
+  "unsupported_claim_rate": 0.0,
+  "causal_support_rate": 1.0,
+  "sentence_level_semantic_entailment": "NOT EVALUATED (requires calibrated NLI judge model)",
+  "label_breakdown": {
+    "SUPPORTED": 60,
+    "PARTIALLY_SUPPORTED": 60,
+    "UNSUPPORTED": 0,
+    "CONTRADICTED": 0
+  }
+}

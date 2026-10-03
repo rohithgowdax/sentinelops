@@ -1,0 +1,16 @@
+{
+  "manifest_id": "grounding-bench-20261003125937",
+  "git_commit": "20a2306ddbe9dae0f1003a92f869974f908cb7e6",
+  "dataset_version": "v1",
+  "corpus_version": "v2.0.0",
+  "benchmark_version": "v1",
+  "judge_configuration": {
+    "evaluator_type": "HeuristicClaimGroundingEvaluator",
+    "judge_provider": "heuristic",
+    "semantic_nli_configured": false,
+    "token_overlap_threshold": 0.25
+  },
+  "python_version": "3.13.0",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "timestamp": "2026-10-03T12:59:37.579834+00:00"
+}

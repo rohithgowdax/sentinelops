@@ -158,9 +158,17 @@ async def evaluate_single_mode(
         rc_text = ""
         if res.diagnosis:
             rc_text = (res.diagnosis.root_cause + " " + res.diagnosis.explanation).lower()
-            if scenario.expected_root_cause_concept.lower() in rc_text:
-                is_accurate = True
-                accurate_count += 1
+            if hasattr(scenario, "ground_truth"):
+                target_concepts = [scenario.ground_truth.expected_root_cause.lower()] + [
+                    a.lower() for a in scenario.ground_truth.acceptable_root_causes
+                ]
+                if any(concept in rc_text for concept in target_concepts):
+                    is_accurate = True
+                    accurate_count += 1
+            else:
+                if scenario.expected_root_cause_concept.lower() in rc_text:
+                    is_accurate = True
+                    accurate_count += 1
 
         # Citation validity & completeness
         collected_ids = {e.evidence_id for e in res.supporting_evidence}
@@ -258,6 +266,7 @@ async def run_full_investigation_evaluation(
     qdrant_url: str | None = None,
     collection_name: str | None = None,
     output_dir: Path | None = None,
+    dataset_version: str = "v1",
 ) -> dict[str, Any]:
     """
     Run investigation ablation benchmark with machine-readable logging.
@@ -265,7 +274,16 @@ async def run_full_investigation_evaluation(
     settings = get_settings()
     url = qdrant_url or settings.qdrant_url
     collection = collection_name or settings.qdrant_collection
-    out_dir = output_dir or Path("evals/results/investigation")
+    
+    if dataset_version == "v2":
+        from sentinelops.evals.datasets.v2.incident_scenarios_v2 import INCIDENT_BENCHMARK_SCENARIOS_V2
+        scenarios_to_run = INCIDENT_BENCHMARK_SCENARIOS_V2
+        default_out_dir = Path("evals/results/investigation_v2")
+    else:
+        scenarios_to_run = INCIDENT_BENCHMARK_SCENARIOS
+        default_out_dir = Path("evals/results/investigation")
+
+    out_dir = output_dir or default_out_dir
     reports_dir = Path("docs/reports")
     out_dir.mkdir(parents=True, exist_ok=True)
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -297,11 +315,11 @@ async def run_full_investigation_evaluation(
     all_incident_records: list[dict[str, Any]] = []
 
     print(f"\n=========================================================================")
-    print(f"SentinelOps Investigation Benchmark ({len(INCIDENT_BENCHMARK_SCENARIOS)} Incidents | Provider: {provider_filter})")
+    print(f"SentinelOps Investigation Benchmark ({len(scenarios_to_run)} Incidents | Dataset: {dataset_version} | Provider: {provider_filter})")
     print(f"=========================================================================\n")
 
     for mode_name, llm, kp, _ in selected_modes:
-        agg, inc_recs = await evaluate_single_mode(mode_name, llm, kp, INCIDENT_BENCHMARK_SCENARIOS)
+        agg, inc_recs = await evaluate_single_mode(mode_name, llm, kp, scenarios_to_run)
         all_results[mode_name] = agg
         all_incident_records.extend(inc_recs)
 
@@ -317,9 +335,10 @@ async def run_full_investigation_evaluation(
     # Save benchmark manifest
     manifest = {
         "benchmark_name": "sentinelops-incident-investigation-ablation",
-        "benchmark_version": "slice3-v2-hardened",
+        "benchmark_version": f"slice3-{dataset_version}-hardened",
+        "dataset_version": dataset_version,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "scenario_count": len(INCIDENT_BENCHMARK_SCENARIOS),
+        "scenario_count": len(scenarios_to_run),
         "provider_filter": provider_filter,
         "external_api_configured": semantic_llm.is_external_configured,
         "evaluation_notice": (
@@ -340,20 +359,20 @@ async def run_full_investigation_evaluation(
     agg_path = out_dir / "aggregate_results.json"
     agg_path.write_text(json.dumps(all_results, indent=2), encoding="utf-8")
 
-    # Save legacy report path for docs
-    legacy_path = reports_dir / "investigation_benchmark_results.json"
-    report_data = {
-        "manifest": manifest,
-        "scenario_count": len(INCIDENT_BENCHMARK_SCENARIOS),
-        "results": all_results,
-    }
-    legacy_path.write_text(json.dumps(report_data, indent=2), encoding="utf-8")
+    # Save legacy report path for docs if v1
+    if dataset_version == "v1":
+        legacy_path = reports_dir / "investigation_benchmark_results.json"
+        report_data = {
+            "manifest": manifest,
+            "scenario_count": len(scenarios_to_run),
+            "results": all_results,
+        }
+        legacy_path.write_text(json.dumps(report_data, indent=2), encoding="utf-8")
 
     print(f"\nSaved artifacts:")
     print(f"  - {manifest_path}")
     print(f"  - {jsonl_path}")
-    print(f"  - {agg_path}")
-    print(f"  - {legacy_path}\n")
+    print(f"  - {agg_path}\n")
 
     return all_results
 
@@ -370,7 +389,14 @@ def main() -> None:
     )
     parser.add_argument("--qdrant-url", type=str, default="http://localhost:6333")
     parser.add_argument("--collection", type=str, default="sentinelops_knowledge")
-    parser.add_argument("--output-dir", type=Path, default=Path("evals/results/investigation"))
+    parser.add_argument("--output-dir", type=Path, default=None)
+    parser.add_argument(
+        "--dataset-version",
+        type=str,
+        default="v1",
+        choices=["v1", "v2"],
+        help="Dataset version to evaluate: v1 (30 incidents) or v2 (60 hardened incidents)",
+    )
     args = parser.parse_args()
 
     asyncio.run(
@@ -379,6 +405,7 @@ def main() -> None:
             qdrant_url=args.qdrant_url,
             collection_name=args.collection,
             output_dir=args.output_dir,
+            dataset_version=args.dataset_version,
         )
     )
 

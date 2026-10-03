@@ -1,0 +1,258 @@
+{
+  "metadata": {
+    "analysis_type": "retrieval_paired_bootstrap_analysis",
+    "git_commit": "20a2306ddbe9dae0f1003a92f869974f908cb7e6",
+    "dataset_version": "v1",
+    "bootstrap_iterations": 2000,
+    "random_seed": 42,
+    "python_version": "3.13.0",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "timestamp": "2026-10-03T13:00:56.194255+00:00",
+    "statistical_methods": [
+      "Paired Percentile Bootstrap (resampled with replacement per query)",
+      "Empirical 95% Bootstrap Confidence Interval"
+    ]
+  },
+  "comparisons": [
+    {
+      "mode_a": "dense_only",
+      "mode_b": "sparse_only",
+      "metric_name": "recall_at_5",
+      "sample_count": 50,
+      "mean_a": 0.74,
+      "mean_b": 0.78,
+      "mean_difference": -0.04,
+      "difference_ci_95": [
+        -0.11,
+        0.0233
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.866890+00:00"
+    },
+    {
+      "mode_a": "dense_only",
+      "mode_b": "sparse_only",
+      "metric_name": "recall_at_10",
+      "sample_count": 50,
+      "mean_a": 0.8133,
+      "mean_b": 0.83,
+      "mean_difference": -0.0167,
+      "difference_ci_95": [
+        -0.07,
+        0.0333
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.898855+00:00"
+    },
+    {
+      "mode_a": "dense_only",
+      "mode_b": "sparse_only",
+      "metric_name": "reciprocal_rank",
+      "sample_count": 50,
+      "mean_a": 0.8392,
+      "mean_b": 0.8667,
+      "mean_difference": -0.0275,
+      "difference_ci_95": [
+        -0.07,
+        0.0
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.927788+00:00"
+    },
+    {
+      "mode_a": "dense_only",
+      "mode_b": "sparse_only",
+      "metric_name": "ndcg_at_10",
+      "sample_count": 50,
+      "mean_a": 0.7862,
+      "mean_b": 0.8279,
+      "mean_difference": -0.0417,
+      "difference_ci_95": [
+        -0.091,
+        0.0021
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.956910+00:00"
+    },
+    {
+      "mode_a": "dense_only",
+      "mode_b": "hybrid",
+      "metric_name": "recall_at_5",
+      "sample_count": 50,
+      "mean_a": 0.74,
+      "mean_b": 0.7633,
+      "mean_difference": -0.0233,
+      "difference_ci_95": [
+        -0.0733,
+        0.0167
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.986304+00:00"
+    },
+    {
+      "mode_a": "dense_only",
+      "mode_b": "hybrid",
+      "metric_name": "recall_at_10",
+      "sample_count": 50,
+      "mean_a": 0.8133,
+      "mean_b": 0.84,
+      "mean_difference": -0.0267,
+      "difference_ci_95": [
+        -0.06,
+        0.0
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:56.015183+00:00"
+    },
+    {
+      "mode_a": "dense_only",
+      "mode_b": "hybrid",
+      "metric_name": "reciprocal_rank",
+      "sample_count": 50,
+      "mean_a": 0.8392,
+      "mean_b": 0.8567,
+      "mean_difference": -0.0175,
+      "difference_ci_95": [
+        -0.0525,
+        0.0
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:56.043769+00:00"
+    },
+    {
+      "mode_a": "dense_only",
+      "mode_b": "hybrid",
+      "metric_name": "ndcg_at_10",
+      "sample_count": 50,
+      "mean_a": 0.7862,
+      "mean_b": 0.822,
+      "mean_difference": -0.0358,
+      "difference_ci_95": [
+        -0.075,
+        -0.0062
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": true,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:56.072598+00:00"
+    },
+    {
+      "mode_a": "hybrid",
+      "mode_b": "hybrid_plus_rerank",
+      "metric_name": "recall_at_5",
+      "sample_count": 50,
+      "mean_a": 0.7633,
+      "mean_b": 0.79,
+      "mean_difference": -0.0267,
+      "difference_ci_95": [
+        -0.07,
+        0.0133
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:56.101151+00:00"
+    },
+    {
+      "mode_a": "hybrid",
+      "mode_b": "hybrid_plus_rerank",
+      "metric_name": "recall_at_10",
+      "sample_count": 50,
+      "mean_a": 0.84,
+      "mean_b": 0.84,
+      "mean_difference": 0.0,
+      "difference_ci_95": [
+        0.0,
+        0.0
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:56.129829+00:00"
+    },
+    {
+      "mode_a": "hybrid",
+      "mode_b": "hybrid_plus_rerank",
+      "metric_name": "reciprocal_rank",
+      "sample_count": 50,
+      "mean_a": 0.8567,
+      "mean_b": 0.83,
+      "mean_difference": 0.0267,
+      "difference_ci_95": [
+        -0.01,
+        0.075
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:56.158512+00:00"
+    },
+    {
+      "mode_a": "hybrid",
+      "mode_b": "hybrid_plus_rerank",
+      "metric_name": "ndcg_at_10",
+      "sample_count": 50,
+      "mean_a": 0.822,
+      "mean_b": 0.8057,
+      "mean_difference": 0.0163,
+      "difference_ci_95": [
+        -0.0134,
+        0.0517
+      ],
+      "bootstrap_iterations": 2000,
+      "random_seed": 42,
+      "test_name": "Paired Percentile Bootstrap (2000 resamples)",
+      "is_significant_at_0_05": false,
+      "benchmark_manifest_id": "ret-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:56.187472+00:00"
+    }
+  ]
+}

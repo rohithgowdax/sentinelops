@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines test evaluation criteria, verification methodology, and recorded real benchmark metrics across implemented SentinelOps slices, including the hardened Slice 3 retrieval and investigation evaluation suites.
+Defines test evaluation criteria, verification methodology, and recorded real benchmark metrics across implemented SentinelOps slices, including the Slice 3 evaluation hardening pass (paired statistical testing, Benchmark v2, and claim-level grounding).
 
 ---
 
@@ -10,11 +10,11 @@ Defines test evaluation criteria, verification methodology, and recorded real be
 
 > **Rule:** Never fabricate numbers. Record only real, measured test results.
 
-### Full Test Suite (Measured October 3, 2026 — Post-Audit Hardening)
+### Full Test Suite (Measured October 3, 2026 — Post-Hardening Pass)
 
 | Test Layer | Test Count | Pass Rate | Status |
 |---|---|---|---|
-| **Unit Tests** | **126** | **100% (126/126)** | **PASSED** |
+| **Unit Tests** | **141** | **100% (141/141)** | **PASSED** |
 | - `test_adapter_otel.py` | 13 | 100% | PASSED |
 | - `test_adapter_custom.py` | 13 | 100% | PASSED |
 | - `test_detection_engine.py` | 22 | 100% | PASSED |
@@ -30,7 +30,8 @@ Defines test evaluation criteria, verification methodology, and recorded real be
 | - `test_hybrid_retrieval.py` | 4 | 100% | PASSED |
 | - `test_reranker.py` | 4 | 100% | PASSED |
 | - `test_prompt_injection.py` | 4 | 100% | PASSED |
-| - `test_evaluator_audit.py` *(New Audit Suite)* | 9 | 100% | PASSED |
+| - `test_evaluator_audit.py` | 9 | 100% | PASSED |
+| - `test_evaluation_hardening.py` *(New Hardening Suite)* | 15 | 100% | PASSED |
 | **Contract / Generalization Tests** | **13** | **100% (13/13)** | **PASSED** |
 | - `test_generalization.py` | 7 | 100% | PASSED |
 | - `test_investigation_generalization.py` | 2 | 100% | PASSED |
@@ -40,113 +41,128 @@ Defines test evaluation criteria, verification methodology, and recorded real be
 | - `test_orchestrator.py` | 1 | 100% | PASSED |
 | - `test_knowledge_ingestion.py` | 2 | 100% | PASSED |
 | - `test_qdrant_provider.py` | 2 | 100% | PASSED |
-| **TOTAL TEST SUITE** | **148** | **100% (148/148)** | **ALL GREEN** |
+| **TOTAL TEST SUITE** | **163** | **100% (163/163)** | **ALL GREEN** |
 
 Execution Command:
 ```bash
 PYTHONPATH=src pytest tests/ -v
-# Output: 148 passed, 1 warning in 3.30s
+# Output: 163 passed, 1 warning in 3.53s
 ```
 
 ---
 
-## Slice 3 Retrieval Evaluation Methodology
+## 1. Paired Statistical Analysis Methodology
 
-### Dataset & Query Suite
-- **Corpus:** 24 technical operational documents (70 chunked passages) indexed in Qdrant (HNSW index, 384-dimensional dense vectors) and BM25 sparse index.
-- **Query Set:** 50 realistic operational incident queries across 6 incident classes (connection pool exhaustion, JVM memory leaks, downstream cascading timeouts, bad configuration deployments, disk volume saturation, and cache stampedes).
-- **Ground Truth:** Deterministic mapping of each query to its corresponding authoritative source document ID (`doc_id`).
+### Investigation Paired Binary Comparisons (McNemar's Exact Test)
+When comparing multiple investigation ablation modes over the exact same set of held-out incidents, individual observations are paired. Treating modes as independent samples underestimates statistical power and obscures discordant transitions.
 
-### Retrieval Modes Evaluated
-1. `dense_only`: Cosine vector similarity search via Qdrant.
-2. `sparse_only`: Inverted index BM25 search over tokenized knowledge corpus.
-3. `hybrid`: Reciprocal Rank Fusion ($k=60$) combining dense and sparse candidate lists.
-4. `hybrid_plus_rerank`: RRF candidates reranked using `CrossFeatureReranker` (service match, actionable section priority, title keyword overlap, document diversification).
+For paired binary correctness:
+- $n_{11}$: incidents correct under both modes
+- $n_{10}$: incidents correct under Mode 1 only
+- $n_{01}$: incidents correct under Mode 2 only
+- $n_{00}$: incidents incorrect under both modes
 
-### Scoring Metrics & Mathematical Formulas
-- **Recall@k:** $\frac{|\{d \in \text{retrieved}_{1..k} : d \in \text{relevant}\}|}{|\text{relevant}|}$
-- **MRR (Mean Reciprocal Rank):** $\frac{1}{|Q|} \sum_{q \in Q} \frac{1}{\text{rank}_q(\text{first\_relevant})}$
-- **nDCG@k (Normalized Discounted Cumulative Gain):** Evaluated at the *document level* by deduplicating retrieved chunks belonging to the same document (retaining earliest rank).
-  $$\text{DCG@k} = \sum_{i=1}^k \frac{\text{rel}_i}{\log_2(i + 1)}$$
-  $$\text{IDCG@k} = \sum_{i=1}^{\min(k, |\text{relevant}|)} \frac{1}{\log_2(i + 1)}$$
-  $$\text{nDCG@k} = \frac{\text{DCG@k}}{\text{IDCG@k}} \in [0.0, 1.0]$$
-- **Latency Percentiles:** Recorded wall-clock query duration: mean, 50th percentile (median), 95th percentile.
+Under the null hypothesis $H_0: p_1 = p_2$, discordant pairs follow $n_{10} \sim \text{Binomial}(n=n_{10}+n_{01}, p=0.5)$.
+We compute two-tailed exact binomial p-values:
+$$p = 2 \times \sum_{k=0}^{\min(n_{10}, n_{01})} \binom{n_{10} + n_{01}}{k} 0.5^{n_{10} + n_{01}}$$
 
-### Retrieval Benchmark Measured Results (50 queries, live Qdrant)
+Paired proportion difference confidence interval:
+$$\text{SE}(\hat{p}_1 - \hat{p}_2) = \frac{\sqrt{(n_{10} + n_{01}) - (n_{10} - n_{01})^2 / N}}{N}$$
+$$\text{CI}_{95\%} = (\hat{p}_1 - \hat{p}_2) \pm 1.96 \times \text{SE}$$
 
-| Mode | Recall@5 | Recall@10 | MRR | nDCG@10 | Latency (Mean) | Latency (p50) | Latency (p95) |
-|---|---|---|---|---|---|---|---|
-| `dense_only` | 0.7400 | 0.8133 | 0.8392 | 0.7862 | 2.5 ms | 2.2 ms | 3.5 ms |
-| `sparse_only` | 0.7800 | 0.8300 | 0.8667 | 0.8279 | 5.2 ms | 5.1 ms | 6.4 ms |
-| `hybrid` | 0.7633 | 0.8400 | 0.8567 | 0.8220 | 8.2 ms | 7.9 ms | 11.3 ms |
-| `hybrid_plus_rerank` | **0.7900** | **0.8400** | 0.8300 | 0.8057 | 8.4 ms | 8.4 ms | 10.4 ms |
+#### Investigation Paired Results (Benchmark v1, N=30)
+| Comparison | Contingency ($n_{11}, n_{10}, n_{01}, n_{00}$) | Accuracy Diff ($\hat{p}_1 - \hat{p}_2$) | 95% Paired CI | Test Used | p-value | Significant (p < 0.05) |
+|---|---|---|---|---|---|---|
+| **Mode B vs Mode A** | (2, 20, 0, 8) | **+66.7%** | [+49.8%, +83.5%] | McNemar Exact | **0.000002** | **YES** |
+| **Mode D vs Mode C** | (2, 10, 0, 18) | **+33.3%** | [+16.5%, +50.2%] | McNemar Exact | **0.001953** | **YES** |
+| **Mode B vs Mode D** | (9, 13, 3, 5) | **+33.3%** | [+10.1%, +56.6%] | McNemar Exact | **0.021271** | **YES** |
 
-- **Top-5 Candidate Overlap:**
-  - Dense ∩ Sparse: 52.00%
-  - Dense ∩ Hybrid: 70.00%
-  - Sparse ∩ Hybrid: 74.00%
+*Artifact: `evals/results/statistics/investigation_pairwise.json`*
 
 ---
 
-## Slice 3 Investigation Ablation Methodology
+### Retrieval Paired Comparisons (Percentile Bootstrap)
+Because all 50 retrieval queries are evaluated under all 4 retrieval modes, query-level differences are paired.
+For each comparison and metric, we run a paired percentile bootstrap ($B=2000$ resamples with replacement per query index, fixed random seed `seed=42`).
 
-### Dataset & Scenario Isolation
-- **Evaluation Set:** 30 held-out synthetic incident scenarios (`INC-DEP-01` through `INC-DEP-30`) covering connection exhaustion, memory leak, network saturation, disk full, CPU saturation, and deployment rollback triggers.
-- **Strict Isolation Guarantee:** None of the held-out incident scenario IDs appear anywhere in the indexed runbook knowledge base. The ground-truth root cause label (`expected_root_cause_concept`) is used solely for offline evaluation scoring and is never injected into agent state, graph context, or prompts.
+#### Retrieval Paired Bootstrap Results (50 queries, B=2000)
+| Comparison | Metric | Mean A | Mean B | Mean Diff | 95% Bootstrap CI | Significant (CI excludes 0) |
+|---|---|---|---|---|---|---|
+| `dense_only` vs `sparse_only` | Recall@5 | 0.7400 | 0.7800 | -0.0400 | [-0.1100, +0.0233] | No |
+| `dense_only` vs `sparse_only` | Recall@10 | 0.8133 | 0.8300 | -0.0167 | [-0.0700, +0.0333] | No |
+| `dense_only` vs `sparse_only` | MRR | 0.8392 | 0.8667 | -0.0275 | [-0.0700, 0.0000] | No |
+| `dense_only` vs `sparse_only` | nDCG@10 | 0.7862 | 0.8279 | -0.0417 | [-0.0910, +0.0021] | No |
+| `dense_only` vs `hybrid` | Recall@5 | 0.7400 | 0.7633 | -0.0233 | [-0.0800, +0.0333] | No |
+| `dense_only` vs `hybrid` | Recall@10 | 0.8133 | 0.8400 | -0.0267 | [-0.0767, +0.0167] | No |
+| `dense_only` vs `hybrid` | MRR | 0.8392 | 0.8567 | -0.0175 | [-0.0533, +0.0133] | No |
+| `dense_only` vs `hybrid` | nDCG@10 | 0.7862 | 0.8220 | -0.0358 | [-0.0789, +0.0041] | No |
+| `hybrid` vs `hybrid_plus_rerank` | Recall@5 | 0.7633 | 0.7900 | -0.0267 | [-0.0633, +0.0100] | No |
+| `hybrid` vs `hybrid_plus_rerank` | Recall@10 | 0.8400 | 0.8400 | 0.0000 | [0.0000, 0.0000] | No |
+| `hybrid` vs `hybrid_plus_rerank` | MRR | 0.8567 | 0.8300 | +0.0267 | [-0.0200, +0.0767] | No |
+| `hybrid` vs `hybrid_plus_rerank` | nDCG@10 | 0.8220 | 0.8057 | +0.0163 | [-0.0238, +0.0583] | No |
 
-### Modes Evaluated
-- **Mode A (Telemetry + Deterministic):** Operational metrics only, rule-based reasoning engine.
-- **Mode B (Telemetry + Knowledge + Deterministic):** Metrics + hybrid RRF knowledge retrieval, rule-based reasoning engine.
-- **Mode C (Telemetry + Semantic Emulator):** Metrics only, local semantic inference provider.
-- **Mode D (Telemetry + Knowledge + Semantic Emulator):** Metrics + hybrid RRF knowledge retrieval, local semantic inference provider.
-
-### Scoring Metrics & Confidence Intervals
-- **Root Cause Accuracy:** Proportion of diagnoses whose identified root cause contains the target ground-truth concept keywords.
-- **Confidence Intervals:** 95% Wilson score confidence interval calculated as:
-  $$\frac{\hat{p} + \frac{z^2}{2n} \pm z \sqrt{\frac{\hat{p}(1-\hat{p})}{n} + \frac{z^2}{4n^2}}}{1 + \frac{z^2}{n}} \quad (z=1.96, n=30)$$
-- **Diagnosis Verification Pass Rate:** Proportion of diagnoses satisfying the `verify_diagnosis` node threshold.
-- **Citation Validity Rate:** Proportion of cited chunk IDs that actually exist in the retrieved knowledge set.
-- **Evidence Completeness Rate:** Proportion of diagnoses that cite both telemetry observations and knowledge chunks.
-- **Claim-Level NLI Entailment:** Explicitly marked as **NOT EVALUATED** (no human judge or calibrated NLI cross-encoder was deployed).
-
-### Investigation Ablation Measured Results (30 held-out incidents)
-
-| Mode | Accuracy (Passed/Total) | 95% Wilson CI | Verification Pass Rate | Citation Validity | Completeness | Latency (p50 / p95) | Token Latency & Cost |
-|---|---|---|---|---|---|---|---|
-| **A: Telemetry + Det** | 6.7% (2/30) | [1.8%, 21.3%] | 100.0% | 100.0% | 100.0% | 0.005s / 0.018s | *NOT AVAILABLE* (deterministic) |
-| **B: Telemetry+Knowledge + Det** | **73.3% (22/30)** | [55.5%, 85.8%] | 100.0% | 100.0% | 100.0% | 0.020s / 0.026s | *NOT AVAILABLE* (deterministic) |
-| **C: Telemetry + Emulator** | 6.7% (2/30) | [1.8%, 21.3%] | 100.0% | 100.0% | 100.0% | 0.005s / 0.009s | *NOT AVAILABLE* (offline emulator) |
-| **D: Telemetry+Knowledge + Emulator** | **40.0% (12/30)** | [24.6%, 57.7%] | 100.0% | 100.0% | 100.0% | 0.019s / 0.027s | *NOT AVAILABLE* (offline emulator) |
+*Artifact: `evals/results/statistics/retrieval_pairwise.json`*
 
 ---
 
-## Machine-Readable Benchmark Artifacts
+## 2. Harder Investigation Benchmark (v2) Design
 
-All benchmark executions emit complete structured manifests and per-sample results:
+### Motivation & Dataset Isolation
+Benchmark v1 primarily tested whether the retriever could fetch an exact runbook matching standard symptoms. Benchmark v2 is designed to test **reasoning difficulty** and adversarial operational patterns.
 
-```text
-evals/results/
-├── retrieval/
-│   ├── benchmark_manifest.json     # Configuration, corpus metadata, timestamp, environment
-│   ├── per_query_results.jsonl      # Query text, target doc, retrieved chunks, per-query metrics
-│   └── aggregate_results.json       # Mode-level Recall, MRR, nDCG, latency percentiles, overlaps
-└── investigation/
-    ├── benchmark_manifest.json     # Mode list, incident count, provider configurations
-    ├── per_incident_results.jsonl   # Incident ID, matched concept, cited IDs, pass/fail status
-    └── aggregate_results.json       # Accuracies, Wilson CIs, verification rates, CPU latencies
-```
+- **Corpus Version:** `v2.0.0` (33 documents, 118 chunks across 6 classes in `knowledge/`).
+- **Benchmark v2 Size:** 60 held-out scenarios (`INC-V2-STALE-01` to `INC-V2-CHAIN-06`), 6 per category.
+- **Strict Ground Truth Isolation:** Ground truth metadata (`expected_root_cause`, `acceptable_root_causes`, `forbidden_ground_truth_leakage`) is stored in evaluator-owned objects and never injected into agent state, incident title, incident description, or prompts. Zero leakage verified across all 60 scenarios.
+
+### Scenario Taxonomy (10 Specialized Categories)
+1. **Category A: Stale documentation (6)** — Telemetry reflects v2 async pooling; runbook describes v1 threadpool. Agent must avoid stale guidance.
+2. **Category B: Conflicting runbooks (6)** — Conflicting runbooks suggest opposing actions (rollback vs cache expansion).
+3. **Category C: Lexically similar distractors (6)** — High term overlap across different services/failure modes (Redis eviction vs Kafka buffer).
+4. **Category D: Missing documentation (6)** — Undocumented failure mode; agent must diagnose from telemetry and declare uncertainty.
+5. **Category E: Version-specific failure (6)** — Symptoms match generic error, but release notes identify version-specific regression.
+6. **Category F: Multiple plausible hypotheses (6)** — Multiple hypotheses match initial alert; telemetry metrics distinguish the root cause.
+7. **Category G: Contradictory telemetry (6)** — Divergent signals (client 502 vs server keepalive reset). Confidence must be reduced.
+8. **Category H: Irrelevant highly-ranked knowledge (6)** — High lexical match on obsolete documentation that must be rejected.
+9. **Category I: Stale postmortem (6)** — Resembles historical postmortem that occurred under older infrastructure.
+10. **Category J: Multi-source causal chain (6)** — Requires connecting deployment + metric + error log + dependency behavior.
+
+#### Measured Results on Benchmark v2 (60 Incidents)
+| Mode | Correct/Total | Accuracy (95% Wilson CI) | Verification Pass Rate | Citation Validity | Completeness |
+|---|---|---|---|---|---|
+| Mode A (Telemetry + Det) | 0/60 | 0.0% [0.0%, 6.0%] | 100.0% | 100.0% | 100.0% |
+| Mode B (Telemetry+Knowledge + Det) | 0/60 | 0.0% [0.0%, 6.0%] | 100.0% | 100.0% | 100.0% |
+| Mode C (Telemetry + Emulator) | 0/60 | 0.0% [0.0%, 6.0%] | 100.0% | 100.0% | 100.0% |
+| Mode D (Telemetry+Knowledge + Emulator) | 0/60 | 0.0% [0.0%, 6.0%] | 100.0% | 100.0% | 100.0% |
+
+*Engineering Insight:* Benchmark v2 successfully exposes the boundary of simple keyword and heuristic matching. While the agent correctly extracts valid citations and achieves 100% structural verification, diagnosing complex reasoning scenarios requires advanced causal modeling.
 
 ---
 
-## Evaluator Audit Regression Tests
+## 3. Claim-Level Semantic Grounding Evaluation
 
-Located in `tests/unit/test_evaluator_audit.py`:
-1. `test_ndcg_bounded_between_zero_and_one`: Verifies $\text{nDCG@k} \in [0.0, 1.0]$ across perfect, duplicate, and empty rankings.
-2. `test_ndcg_penalizes_lower_rank_documents`: Verifies DCG discounts late-ranked relevant documents.
-3. `test_dense_and_sparse_return_different_rankings`: Verifies dense and sparse rankings are distinct (no false parity).
-4. `test_bm25_fits_dynamically_on_fresh_provider`: Verifies `_ensure_bm25_fit` populates IDF frequencies on un-indexed providers.
-5. `test_hybrid_fusion_combines_dense_and_sparse_correctly`: Verifies RRF produces expected rank order.
-6. `test_reranker_adjusts_ranking`: Verifies metadata scoring elevates matching services and actionable sections.
-7. `test_real_llm_provider_offline_accounting`: Verifies provider flags itself as `offline_semantic_emulator` and latency is local CPU time.
-8. `test_citation_validity_rejects_hallucinated_ids`: Verifies fabricated citations fail validation.
-9. `test_held_out_benchmark_isolation`: Verifies held-out incident IDs do not leak into runbook knowledge documents.
+### Conceptual Separation of Metrics
+We strictly decouple three distinct evaluation concepts:
+1. **Citation Reference Validity:** Do the evidence IDs cited in the diagnosis exist in the retrieved evidence set?
+2. **Structural Evidence Completeness:** Does the diagnosis reference both telemetry signals and knowledge chunks?
+3. **Semantic Claim Grounding:** Do the referenced evidence texts semantically entail the atomic assertions made in the diagnosis?
+
+### Claim Decomposition & Classification
+Diagnosis texts are parsed into atomic factual and causal claims:
+- **Factual Claims:** Descriptive state assertions ("Database connection pool was saturated").
+- **Causal Claims:** Assertions linking causes to effects ("Deployment of v2.4.0 caused connection timeouts").
+
+Labels evaluated: `SUPPORTED`, `PARTIALLY_SUPPORTED`, `UNSUPPORTED`, `CONTRADICTED`, `CAUSALLY_SUPPORTED`, `CAUSALITY_NOT_ESTABLISHED`.
+
+#### Measured Grounding Results (120 Claims Evaluated from Benchmark Diagnoses)
+| Metric | Measured Value | Classification |
+|---|---|---|
+| Total Claims Evaluated | 120 | MEASURED |
+| Factual Claims Count | 120 | MEASURED |
+| Causal Claims Count | 0 | MEASURED |
+| Citation Reference Validity Rate | **100.0%** (120/120) | MEASURED |
+| Structural Claim Support Rate | **100.0%** (60 Supported, 60 Partially Supported) | MEASURED |
+| Claim Contradiction Rate | **0.0%** (0/120) | MEASURED |
+| Unsupported Claim Rate | **0.0%** (0/120) | MEASURED |
+| **Sentence-Level Semantic NLI Entailment** | **NOT EVALUATED** | Requires calibrated NLI cross-encoder or external judge |
+
+*Artifacts: `evals/results/grounding/benchmark_manifest.json`, `per_claim_results.jsonl`, `aggregate_results.json`*

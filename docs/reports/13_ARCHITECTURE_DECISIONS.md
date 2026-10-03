@@ -295,6 +295,27 @@ An evaluation audit of Slice 3 revealed three critical concerns:
 
 ---
 
+## ADR-019 — Paired Statistical Testing, Benchmark v2, and Claim-Level Semantic Grounding
+
+### Context
+Following the Slice 3 audit, three methodological weaknesses remained in the evaluation framework:
+1. Investigation accuracy comparisons treated ablation modes as independent samples, ignoring the paired structure across identical incident sets.
+2. Benchmark v1 (30 incidents) tested primarily whether an exact matching runbook could be retrieved, rather than assessing complex reasoning under stale documentation, conflicting runbooks, distractors, or missing knowledge.
+3. Citation validation verified only that cited IDs existed in evidence, without evaluating atomic claim decomposition or separating structural reference validity from semantic sentence-level entailment.
+
+### Decision
+1. **Paired Statistical Testing:** Implement McNemar's exact test (binomial distribution on discordant pairs) and paired proportion difference confidence intervals for investigation comparisons. Implement paired percentile bootstrap resampling ($B=2000$) for query-level retrieval metrics.
+2. **Benchmark v2 Dataset:** Author a versioned, held-out 60-incident benchmark across 10 specialized failure/reasoning categories (stale documentation, conflicting runbooks, lexical distractors, missing documentation, version regressions, multiple plausible hypotheses, contradictory telemetry, irrelevant top knowledge, stale postmortems, and multi-source causal chains). Ground truth metadata (`expected_root_cause`, required/contradicting evidence) is strictly segregated from agent context.
+3. **Claim Grounding Protocol:** Define `ClaimGroundingEvaluator` protocol and `HeuristicClaimGroundingEvaluator`. Decompose diagnosis text into atomic factual and causal claims, evaluating citation reference validity and structural keyword support. Explicitly record `semantic_sentence_level_entailment = NOT EVALUATED` when unkeyed rather than fabricating scores.
+4. **Machine-Readable Artifacts:** Persist structured manifests and results under `evals/results/statistics/` and `evals/results/grounding/`.
+
+### Consequences
+- Paired statistical tests quantify effect sizes and p-values defensibly.
+- Benchmark v2 exposes real product weaknesses (0% accuracy on complex reasoning without advanced reasoning capabilities), preventing false sense of security.
+- Citation reference validity and semantic entailment are formally decoupled.
+
+---
+
 ## ADR-016 — Dual LLM Strategy: DeterministicLLMProvider & RealLLMProvider
 
 ### Context

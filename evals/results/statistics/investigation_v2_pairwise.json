@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "analysis_type": "investigation_paired_analysis",
+    "git_commit": "20a2306ddbe9dae0f1003a92f869974f908cb7e6",
+    "dataset_version": "v1",
+    "python_version": "3.13.0",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "timestamp": "2026-10-03T13:00:55.790787+00:00",
+    "statistical_methods": [
+      "McNemar's Exact Test (Binomial distribution on discordant pairs)",
+      "Wald Paired Proportion Difference 95% Confidence Interval"
+    ]
+  },
+  "comparisons": [
+    {
+      "mode_a": "Mode B (Telemetry+Knowledge + Deterministic)",
+      "mode_b": "Mode A (Telemetry-only + Deterministic)",
+      "sample_count": 60,
+      "contingency_table": {
+        "both_correct": 0,
+        "a_only_correct": 0,
+        "b_only_correct": 0,
+        "neither_correct": 60
+      },
+      "accuracy_a": 0.0,
+      "accuracy_b": 0.0,
+      "accuracy_difference": 0.0,
+      "difference_ci_95": [
+        0.0,
+        0.0
+      ],
+      "test_name": "McNemar's Exact Test (Binomial)",
+      "test_statistic": null,
+      "p_value": 1.0,
+      "is_significant_at_0_05": false,
+      "interpretation": "No statistically significant difference detected (p=1.00000 >= 0.05). Observed difference: +0.0% [95% CI: 0.0%, 0.0%].",
+      "benchmark_manifest_id": "inv-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.751360+00:00"
+    },
+    {
+      "mode_a": "Mode D (Telemetry+Knowledge + Semantic LLM)",
+      "mode_b": "Mode C (Telemetry-only + Semantic LLM)",
+      "sample_count": 60,
+      "contingency_table": {
+        "both_correct": 0,
+        "a_only_correct": 0,
+        "b_only_correct": 0,
+        "neither_correct": 60
+      },
+      "accuracy_a": 0.0,
+      "accuracy_b": 0.0,
+      "accuracy_difference": 0.0,
+      "difference_ci_95": [
+        0.0,
+        0.0
+      ],
+      "test_name": "McNemar's Exact Test (Binomial)",
+      "test_statistic": null,
+      "p_value": 1.0,
+      "is_significant_at_0_05": false,
+      "interpretation": "No statistically significant difference detected (p=1.00000 >= 0.05). Observed difference: +0.0% [95% CI: 0.0%, 0.0%].",
+      "benchmark_manifest_id": "inv-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.753536+00:00"
+    },
+    {
+      "mode_a": "Mode B (Telemetry+Knowledge + Deterministic)",
+      "mode_b": "Mode D (Telemetry+Knowledge + Semantic LLM)",
+      "sample_count": 60,
+      "contingency_table": {
+        "both_correct": 0,
+        "a_only_correct": 0,
+        "b_only_correct": 0,
+        "neither_correct": 60
+      },
+      "accuracy_a": 0.0,
+      "accuracy_b": 0.0,
+      "accuracy_difference": 0.0,
+      "difference_ci_95": [
+        0.0,
+        0.0
+      ],
+      "test_name": "McNemar's Exact Test (Binomial)",
+      "test_statistic": null,
+      "p_value": 1.0,
+      "is_significant_at_0_05": false,
+      "interpretation": "No statistically significant difference detected (p=1.00000 >= 0.05). Observed difference: +0.0% [95% CI: 0.0%, 0.0%].",
+      "benchmark_manifest_id": "inv-bench-20261003",
+      "dataset_version": "v1",
+      "timestamp": "2026-10-03T13:00:55.753581+00:00"
+    }
+  ]
+}

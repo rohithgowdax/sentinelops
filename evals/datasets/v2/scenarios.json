@@ -1,0 +1,5354 @@
+[
+  {
+    "scenario_id": "STALE-01",
+    "category_code": "A",
+    "scenario_class": "stale_documentation",
+    "incident": {
+      "incident_id": "INC-V2-STALE-01",
+      "created_at": "2026-10-03T12:58:47.139227Z",
+      "updated_at": "2026-10-03T12:58:47.139227Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-stale-01",
+      "trigger_rule_name": "Database Connection Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "f8689799-faf5-4476-8209-b6d17f6b86ef",
+          "kind": "metric",
+          "description": "Observed db.pool.exhaustion_rate = 0.500",
+          "value": 0.5,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "db.pool.exhaustion_rate",
+            "threshold": 0.2
+          }
+        }
+      ],
+      "title": "Database Connection Saturation on payments-service",
+      "description": "Automated alert: db.pool.exhaustion_rate observed at 0.500, exceeding threshold 0.200",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-stale-01::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-STALE-01",
+      "scenario_class": "stale_documentation",
+      "expected_root_cause": "async connection pool leak in v2 client",
+      "acceptable_root_causes": [
+        "connection pool leak",
+        "async session leak",
+        "v2 connection exhaustion"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v1 threadpool exhaustion"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-02"
+      ],
+      "distractor_documents": [
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "stale v1 threadpool",
+        "ignore v2 async"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 12,
+        "observed_avg": 0.5,
+        "observed_max": 0.6,
+        "observed_min": 0.4,
+        "latest_value": 0.5,
+        "raw_references": [
+          "event-STALE-01-01",
+          "event-STALE-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 10.0
+      }
+    }
+  },
+  {
+    "scenario_id": "STALE-02",
+    "category_code": "A",
+    "scenario_class": "stale_documentation",
+    "incident": {
+      "incident_id": "INC-V2-STALE-02",
+      "created_at": "2026-10-03T12:58:47.139892Z",
+      "updated_at": "2026-10-03T12:58:47.139892Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-stale-02",
+      "trigger_rule_name": "Database Connection Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "65d92fe5-3dbb-47ad-a5f6-1eba3d1daca1",
+          "kind": "metric",
+          "description": "Observed db.pool.exhaustion_rate = 0.550",
+          "value": 0.55,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "db.pool.exhaustion_rate",
+            "threshold": 0.2
+          }
+        }
+      ],
+      "title": "Database Connection Saturation on order-service",
+      "description": "Automated alert: db.pool.exhaustion_rate observed at 0.550, exceeding threshold 0.200",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-stale-02::order-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-STALE-02",
+      "scenario_class": "stale_documentation",
+      "expected_root_cause": "async connection pool leak in v2 client",
+      "acceptable_root_causes": [
+        "connection pool leak",
+        "async session leak",
+        "v2 connection exhaustion"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v1 threadpool exhaustion"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-02"
+      ],
+      "distractor_documents": [
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "stale v1 threadpool",
+        "ignore v2 async"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 12,
+        "observed_avg": 0.55,
+        "observed_max": 0.66,
+        "observed_min": 0.44000000000000006,
+        "latest_value": 0.55,
+        "raw_references": [
+          "event-STALE-02-01",
+          "event-STALE-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 11.0
+      }
+    }
+  },
+  {
+    "scenario_id": "STALE-03",
+    "category_code": "A",
+    "scenario_class": "stale_documentation",
+    "incident": {
+      "incident_id": "INC-V2-STALE-03",
+      "created_at": "2026-10-03T12:58:47.139916Z",
+      "updated_at": "2026-10-03T12:58:47.139916Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-stale-03",
+      "trigger_rule_name": "Database Connection Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "c0cb9671-ae4a-45c5-87b9-dbe027b134eb",
+          "kind": "metric",
+          "description": "Observed db.pool.exhaustion_rate = 0.600",
+          "value": 0.6000000000000001,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "db.pool.exhaustion_rate",
+            "threshold": 0.2
+          }
+        }
+      ],
+      "title": "Database Connection Saturation on payments-service",
+      "description": "Automated alert: db.pool.exhaustion_rate observed at 0.600, exceeding threshold 0.200",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-stale-03::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-STALE-03",
+      "scenario_class": "stale_documentation",
+      "expected_root_cause": "async connection pool leak in v2 client",
+      "acceptable_root_causes": [
+        "connection pool leak",
+        "async session leak",
+        "v2 connection exhaustion"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v1 threadpool exhaustion"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-02"
+      ],
+      "distractor_documents": [
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "stale v1 threadpool",
+        "ignore v2 async"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 12,
+        "observed_avg": 0.6000000000000001,
+        "observed_max": 0.7200000000000001,
+        "observed_min": 0.4800000000000001,
+        "latest_value": 0.6000000000000001,
+        "raw_references": [
+          "event-STALE-03-01",
+          "event-STALE-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 12.0
+      }
+    }
+  },
+  {
+    "scenario_id": "STALE-04",
+    "category_code": "A",
+    "scenario_class": "stale_documentation",
+    "incident": {
+      "incident_id": "INC-V2-STALE-04",
+      "created_at": "2026-10-03T12:58:47.139935Z",
+      "updated_at": "2026-10-03T12:58:47.139935Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-stale-04",
+      "trigger_rule_name": "Database Connection Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "90bb95f9-c0b2-4548-a71f-0c7525f623c8",
+          "kind": "metric",
+          "description": "Observed db.pool.exhaustion_rate = 0.650",
+          "value": 0.65,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "db.pool.exhaustion_rate",
+            "threshold": 0.2
+          }
+        }
+      ],
+      "title": "Database Connection Saturation on order-service",
+      "description": "Automated alert: db.pool.exhaustion_rate observed at 0.650, exceeding threshold 0.200",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-stale-04::order-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-STALE-04",
+      "scenario_class": "stale_documentation",
+      "expected_root_cause": "async connection pool leak in v2 client",
+      "acceptable_root_causes": [
+        "connection pool leak",
+        "async session leak",
+        "v2 connection exhaustion"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v1 threadpool exhaustion"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-02"
+      ],
+      "distractor_documents": [
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "stale v1 threadpool",
+        "ignore v2 async"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 12,
+        "observed_avg": 0.65,
+        "observed_max": 0.78,
+        "observed_min": 0.52,
+        "latest_value": 0.65,
+        "raw_references": [
+          "event-STALE-04-01",
+          "event-STALE-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 13.0
+      }
+    }
+  },
+  {
+    "scenario_id": "STALE-05",
+    "category_code": "A",
+    "scenario_class": "stale_documentation",
+    "incident": {
+      "incident_id": "INC-V2-STALE-05",
+      "created_at": "2026-10-03T12:58:47.139954Z",
+      "updated_at": "2026-10-03T12:58:47.139954Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-stale-05",
+      "trigger_rule_name": "Database Connection Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "8ab24fde-7bd3-4f48-815a-a101c688899e",
+          "kind": "metric",
+          "description": "Observed db.pool.exhaustion_rate = 0.700",
+          "value": 0.7,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "db.pool.exhaustion_rate",
+            "threshold": 0.2
+          }
+        }
+      ],
+      "title": "Database Connection Saturation on payments-service",
+      "description": "Automated alert: db.pool.exhaustion_rate observed at 0.700, exceeding threshold 0.200",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-stale-05::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-STALE-05",
+      "scenario_class": "stale_documentation",
+      "expected_root_cause": "async connection pool leak in v2 client",
+      "acceptable_root_causes": [
+        "connection pool leak",
+        "async session leak",
+        "v2 connection exhaustion"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v1 threadpool exhaustion"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-02"
+      ],
+      "distractor_documents": [
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "stale v1 threadpool",
+        "ignore v2 async"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 12,
+        "observed_avg": 0.7,
+        "observed_max": 0.84,
+        "observed_min": 0.5599999999999999,
+        "latest_value": 0.7,
+        "raw_references": [
+          "event-STALE-05-01",
+          "event-STALE-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 14.0
+      }
+    }
+  },
+  {
+    "scenario_id": "STALE-06",
+    "category_code": "A",
+    "scenario_class": "stale_documentation",
+    "incident": {
+      "incident_id": "INC-V2-STALE-06",
+      "created_at": "2026-10-03T12:58:47.139969Z",
+      "updated_at": "2026-10-03T12:58:47.139969Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-stale-06",
+      "trigger_rule_name": "Database Connection Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "e2eec09b-aedb-4b31-ad83-d3fd2faa2afd",
+          "kind": "metric",
+          "description": "Observed db.pool.exhaustion_rate = 0.750",
+          "value": 0.75,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "db.pool.exhaustion_rate",
+            "threshold": 0.2
+          }
+        }
+      ],
+      "title": "Database Connection Saturation on order-service",
+      "description": "Automated alert: db.pool.exhaustion_rate observed at 0.750, exceeding threshold 0.200",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-stale-06::order-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-STALE-06",
+      "scenario_class": "stale_documentation",
+      "expected_root_cause": "async connection pool leak in v2 client",
+      "acceptable_root_causes": [
+        "connection pool leak",
+        "async session leak",
+        "v2 connection exhaustion"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v1 threadpool exhaustion"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-02"
+      ],
+      "distractor_documents": [
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "stale v1 threadpool",
+        "ignore v2 async"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 12,
+        "observed_avg": 0.75,
+        "observed_max": 0.8999999999999999,
+        "observed_min": 0.6000000000000001,
+        "latest_value": 0.75,
+        "raw_references": [
+          "event-STALE-06-01",
+          "event-STALE-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-service",
+        "metric": "db.pool.exhaustion_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 15.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CONF-01",
+    "category_code": "B",
+    "scenario_class": "conflicting_runbooks",
+    "incident": {
+      "incident_id": "INC-V2-CONF-01",
+      "created_at": "2026-10-03T12:58:47.139984Z",
+      "updated_at": "2026-10-03T12:58:47.139984Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "checkout-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-conf-01",
+      "trigger_rule_name": "Elevated API Latency",
+      "initial_evidence": [
+        {
+          "evidence_id": "530e2f8c-3a7f-450e-b7b5-4ff8aad4dfb2",
+          "kind": "metric",
+          "description": "Observed http.server.duration_p99 = 3.100",
+          "value": 3.0999999999999996,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.server.duration_p99",
+            "threshold": 1.5
+          }
+        }
+      ],
+      "title": "Elevated API Latency on checkout-service",
+      "description": "Automated alert: http.server.duration_p99 observed at 3.100, exceeding threshold 1.500",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-conf-01::checkout-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONF-01",
+      "scenario_class": "conflicting_runbooks",
+      "expected_root_cause": "unindexed query regression requiring rollback",
+      "acceptable_root_causes": [
+        "query regression",
+        "deployment rollback needed",
+        "missing database index"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "log"
+      ],
+      "contradicting_evidence": [
+        "cache size increase alone fixes query regression"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-deploy-005",
+        "pm-2026-04"
+      ],
+      "distractor_documents": [
+        "rb-cache-006"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conflicting instructions",
+        "arbitrary choice"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "checkout-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 12,
+        "observed_avg": 3.0999999999999996,
+        "observed_max": 3.7199999999999993,
+        "observed_min": 2.48,
+        "latest_value": 3.0999999999999996,
+        "raw_references": [
+          "event-CONF-01-01",
+          "event-CONF-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "checkout-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 62.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CONF-02",
+    "category_code": "B",
+    "scenario_class": "conflicting_runbooks",
+    "incident": {
+      "incident_id": "INC-V2-CONF-02",
+      "created_at": "2026-10-03T12:58:47.140000Z",
+      "updated_at": "2026-10-03T12:58:47.140000Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "inventory-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-conf-02",
+      "trigger_rule_name": "Elevated API Latency",
+      "initial_evidence": [
+        {
+          "evidence_id": "971d3fd6-04c6-46b2-8b0f-1466c84e739f",
+          "kind": "metric",
+          "description": "Observed http.server.duration_p99 = 3.400",
+          "value": 3.4,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.server.duration_p99",
+            "threshold": 1.5
+          }
+        }
+      ],
+      "title": "Elevated API Latency on inventory-service",
+      "description": "Automated alert: http.server.duration_p99 observed at 3.400, exceeding threshold 1.500",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-conf-02::inventory-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONF-02",
+      "scenario_class": "conflicting_runbooks",
+      "expected_root_cause": "unindexed query regression requiring rollback",
+      "acceptable_root_causes": [
+        "query regression",
+        "deployment rollback needed",
+        "missing database index"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "log"
+      ],
+      "contradicting_evidence": [
+        "cache size increase alone fixes query regression"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-deploy-005",
+        "pm-2026-04"
+      ],
+      "distractor_documents": [
+        "rb-cache-006"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conflicting instructions",
+        "arbitrary choice"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "inventory-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 12,
+        "observed_avg": 3.4,
+        "observed_max": 4.08,
+        "observed_min": 2.72,
+        "latest_value": 3.4,
+        "raw_references": [
+          "event-CONF-02-01",
+          "event-CONF-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "inventory-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 68.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CONF-03",
+    "category_code": "B",
+    "scenario_class": "conflicting_runbooks",
+    "incident": {
+      "incident_id": "INC-V2-CONF-03",
+      "created_at": "2026-10-03T12:58:47.140014Z",
+      "updated_at": "2026-10-03T12:58:47.140014Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "checkout-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-conf-03",
+      "trigger_rule_name": "Elevated API Latency",
+      "initial_evidence": [
+        {
+          "evidence_id": "9d9d8aa1-2b4c-41bb-98f4-09c7f094af86",
+          "kind": "metric",
+          "description": "Observed http.server.duration_p99 = 3.700",
+          "value": 3.6999999999999997,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.server.duration_p99",
+            "threshold": 1.5
+          }
+        }
+      ],
+      "title": "Elevated API Latency on checkout-service",
+      "description": "Automated alert: http.server.duration_p99 observed at 3.700, exceeding threshold 1.500",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-conf-03::checkout-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONF-03",
+      "scenario_class": "conflicting_runbooks",
+      "expected_root_cause": "unindexed query regression requiring rollback",
+      "acceptable_root_causes": [
+        "query regression",
+        "deployment rollback needed",
+        "missing database index"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "log"
+      ],
+      "contradicting_evidence": [
+        "cache size increase alone fixes query regression"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-deploy-005",
+        "pm-2026-04"
+      ],
+      "distractor_documents": [
+        "rb-cache-006"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conflicting instructions",
+        "arbitrary choice"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "checkout-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 12,
+        "observed_avg": 3.6999999999999997,
+        "observed_max": 4.4399999999999995,
+        "observed_min": 2.96,
+        "latest_value": 3.6999999999999997,
+        "raw_references": [
+          "event-CONF-03-01",
+          "event-CONF-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "checkout-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 74.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CONF-04",
+    "category_code": "B",
+    "scenario_class": "conflicting_runbooks",
+    "incident": {
+      "incident_id": "INC-V2-CONF-04",
+      "created_at": "2026-10-03T12:58:47.140026Z",
+      "updated_at": "2026-10-03T12:58:47.140026Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "inventory-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-conf-04",
+      "trigger_rule_name": "Elevated API Latency",
+      "initial_evidence": [
+        {
+          "evidence_id": "940afe46-cb10-478d-bd5f-12aa674485bf",
+          "kind": "metric",
+          "description": "Observed http.server.duration_p99 = 4.000",
+          "value": 4.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.server.duration_p99",
+            "threshold": 1.5
+          }
+        }
+      ],
+      "title": "Elevated API Latency on inventory-service",
+      "description": "Automated alert: http.server.duration_p99 observed at 4.000, exceeding threshold 1.500",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-conf-04::inventory-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONF-04",
+      "scenario_class": "conflicting_runbooks",
+      "expected_root_cause": "unindexed query regression requiring rollback",
+      "acceptable_root_causes": [
+        "query regression",
+        "deployment rollback needed",
+        "missing database index"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "log"
+      ],
+      "contradicting_evidence": [
+        "cache size increase alone fixes query regression"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-deploy-005",
+        "pm-2026-04"
+      ],
+      "distractor_documents": [
+        "rb-cache-006"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conflicting instructions",
+        "arbitrary choice"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "inventory-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 12,
+        "observed_avg": 4.0,
+        "observed_max": 4.8,
+        "observed_min": 3.2,
+        "latest_value": 4.0,
+        "raw_references": [
+          "event-CONF-04-01",
+          "event-CONF-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "inventory-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 80.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CONF-05",
+    "category_code": "B",
+    "scenario_class": "conflicting_runbooks",
+    "incident": {
+      "incident_id": "INC-V2-CONF-05",
+      "created_at": "2026-10-03T12:58:47.140037Z",
+      "updated_at": "2026-10-03T12:58:47.140037Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "checkout-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-conf-05",
+      "trigger_rule_name": "Elevated API Latency",
+      "initial_evidence": [
+        {
+          "evidence_id": "249d1a17-72f2-4bb1-a89a-f28f809ad9af",
+          "kind": "metric",
+          "description": "Observed http.server.duration_p99 = 4.300",
+          "value": 4.3,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.server.duration_p99",
+            "threshold": 1.5
+          }
+        }
+      ],
+      "title": "Elevated API Latency on checkout-service",
+      "description": "Automated alert: http.server.duration_p99 observed at 4.300, exceeding threshold 1.500",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-conf-05::checkout-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONF-05",
+      "scenario_class": "conflicting_runbooks",
+      "expected_root_cause": "unindexed query regression requiring rollback",
+      "acceptable_root_causes": [
+        "query regression",
+        "deployment rollback needed",
+        "missing database index"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "log"
+      ],
+      "contradicting_evidence": [
+        "cache size increase alone fixes query regression"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-deploy-005",
+        "pm-2026-04"
+      ],
+      "distractor_documents": [
+        "rb-cache-006"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conflicting instructions",
+        "arbitrary choice"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "checkout-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 12,
+        "observed_avg": 4.3,
+        "observed_max": 5.159999999999999,
+        "observed_min": 3.44,
+        "latest_value": 4.3,
+        "raw_references": [
+          "event-CONF-05-01",
+          "event-CONF-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "checkout-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 86.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CONF-06",
+    "category_code": "B",
+    "scenario_class": "conflicting_runbooks",
+    "incident": {
+      "incident_id": "INC-V2-CONF-06",
+      "created_at": "2026-10-03T12:58:47.140048Z",
+      "updated_at": "2026-10-03T12:58:47.140048Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "inventory-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-conf-06",
+      "trigger_rule_name": "Elevated API Latency",
+      "initial_evidence": [
+        {
+          "evidence_id": "35192533-edee-4cd9-b4ad-fc911a09a449",
+          "kind": "metric",
+          "description": "Observed http.server.duration_p99 = 4.600",
+          "value": 4.6,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.server.duration_p99",
+            "threshold": 1.5
+          }
+        }
+      ],
+      "title": "Elevated API Latency on inventory-service",
+      "description": "Automated alert: http.server.duration_p99 observed at 4.600, exceeding threshold 1.500",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-conf-06::inventory-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONF-06",
+      "scenario_class": "conflicting_runbooks",
+      "expected_root_cause": "unindexed query regression requiring rollback",
+      "acceptable_root_causes": [
+        "query regression",
+        "deployment rollback needed",
+        "missing database index"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "log"
+      ],
+      "contradicting_evidence": [
+        "cache size increase alone fixes query regression"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-deploy-005",
+        "pm-2026-04"
+      ],
+      "distractor_documents": [
+        "rb-cache-006"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conflicting instructions",
+        "arbitrary choice"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "inventory-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 12,
+        "observed_avg": 4.6,
+        "observed_max": 5.52,
+        "observed_min": 3.6799999999999997,
+        "latest_value": 4.6,
+        "raw_references": [
+          "event-CONF-06-01",
+          "event-CONF-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "inventory-service",
+        "metric": "http.server.duration_p99",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 92.0
+      }
+    }
+  },
+  {
+    "scenario_id": "LEX-01",
+    "category_code": "C",
+    "scenario_class": "lexically_similar_distractors",
+    "incident": {
+      "incident_id": "INC-V2-LEX-01",
+      "created_at": "2026-10-03T12:58:47.140062Z",
+      "updated_at": "2026-10-03T12:58:47.140062Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-lex-01",
+      "trigger_rule_name": "Eviction Rate Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "47dc6094-2df7-4cb7-ae57-a95d0a2fd798",
+          "kind": "metric",
+          "description": "Observed cache.eviction_rate = 1700.000",
+          "value": 1700.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "cache.eviction_rate",
+            "threshold": 500.0
+          }
+        }
+      ],
+      "title": "Eviction Rate Spike on auth-service",
+      "description": "Automated alert: cache.eviction_rate observed at 1700.000, exceeding threshold 500.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-lex-01::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-LEX-01",
+      "scenario_class": "lexically_similar_distractors",
+      "expected_root_cause": "redis maxmemory policy key eviction",
+      "acceptable_root_causes": [
+        "redis eviction",
+        "cache memory exhaustion",
+        "session store eviction"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka queue backlog",
+        "postgres connection pool"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-cache-006",
+        "pm-2026-03"
+      ],
+      "distractor_documents": [
+        "rb-queue-004",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "kafka distractor",
+        "wrong service match"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 12,
+        "observed_avg": 1700.0,
+        "observed_max": 2040.0,
+        "observed_min": 1360.0,
+        "latest_value": 1700.0,
+        "raw_references": [
+          "event-LEX-01-01",
+          "event-LEX-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 34.0
+      }
+    }
+  },
+  {
+    "scenario_id": "LEX-02",
+    "category_code": "C",
+    "scenario_class": "lexically_similar_distractors",
+    "incident": {
+      "incident_id": "INC-V2-LEX-02",
+      "created_at": "2026-10-03T12:58:47.140076Z",
+      "updated_at": "2026-10-03T12:58:47.140076Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "notification-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-lex-02",
+      "trigger_rule_name": "Eviction Rate Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "91d6fc8e-0fd8-4320-96b3-24bd543d8b80",
+          "kind": "metric",
+          "description": "Observed cache.eviction_rate = 1900.000",
+          "value": 1900.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "cache.eviction_rate",
+            "threshold": 500.0
+          }
+        }
+      ],
+      "title": "Eviction Rate Spike on notification-service",
+      "description": "Automated alert: cache.eviction_rate observed at 1900.000, exceeding threshold 500.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-lex-02::notification-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-LEX-02",
+      "scenario_class": "lexically_similar_distractors",
+      "expected_root_cause": "redis maxmemory policy key eviction",
+      "acceptable_root_causes": [
+        "redis eviction",
+        "cache memory exhaustion",
+        "session store eviction"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka queue backlog",
+        "postgres connection pool"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-cache-006",
+        "pm-2026-03"
+      ],
+      "distractor_documents": [
+        "rb-queue-004",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "kafka distractor",
+        "wrong service match"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "notification-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 12,
+        "observed_avg": 1900.0,
+        "observed_max": 2280.0,
+        "observed_min": 1520.0,
+        "latest_value": 1900.0,
+        "raw_references": [
+          "event-LEX-02-01",
+          "event-LEX-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "notification-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 38.0
+      }
+    }
+  },
+  {
+    "scenario_id": "LEX-03",
+    "category_code": "C",
+    "scenario_class": "lexically_similar_distractors",
+    "incident": {
+      "incident_id": "INC-V2-LEX-03",
+      "created_at": "2026-10-03T12:58:47.140088Z",
+      "updated_at": "2026-10-03T12:58:47.140088Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-lex-03",
+      "trigger_rule_name": "Eviction Rate Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "feec4507-f733-4fbb-b7b9-355530dc2d7e",
+          "kind": "metric",
+          "description": "Observed cache.eviction_rate = 2100.000",
+          "value": 2100.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "cache.eviction_rate",
+            "threshold": 500.0
+          }
+        }
+      ],
+      "title": "Eviction Rate Spike on auth-service",
+      "description": "Automated alert: cache.eviction_rate observed at 2100.000, exceeding threshold 500.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-lex-03::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-LEX-03",
+      "scenario_class": "lexically_similar_distractors",
+      "expected_root_cause": "redis maxmemory policy key eviction",
+      "acceptable_root_causes": [
+        "redis eviction",
+        "cache memory exhaustion",
+        "session store eviction"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka queue backlog",
+        "postgres connection pool"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-cache-006",
+        "pm-2026-03"
+      ],
+      "distractor_documents": [
+        "rb-queue-004",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "kafka distractor",
+        "wrong service match"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 12,
+        "observed_avg": 2100.0,
+        "observed_max": 2520.0,
+        "observed_min": 1680.0,
+        "latest_value": 2100.0,
+        "raw_references": [
+          "event-LEX-03-01",
+          "event-LEX-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 42.0
+      }
+    }
+  },
+  {
+    "scenario_id": "LEX-04",
+    "category_code": "C",
+    "scenario_class": "lexically_similar_distractors",
+    "incident": {
+      "incident_id": "INC-V2-LEX-04",
+      "created_at": "2026-10-03T12:58:47.140099Z",
+      "updated_at": "2026-10-03T12:58:47.140099Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "notification-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-lex-04",
+      "trigger_rule_name": "Eviction Rate Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "eafe505f-d8b1-4727-9fb5-185a7a5bdc09",
+          "kind": "metric",
+          "description": "Observed cache.eviction_rate = 2300.000",
+          "value": 2300.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "cache.eviction_rate",
+            "threshold": 500.0
+          }
+        }
+      ],
+      "title": "Eviction Rate Spike on notification-service",
+      "description": "Automated alert: cache.eviction_rate observed at 2300.000, exceeding threshold 500.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-lex-04::notification-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-LEX-04",
+      "scenario_class": "lexically_similar_distractors",
+      "expected_root_cause": "redis maxmemory policy key eviction",
+      "acceptable_root_causes": [
+        "redis eviction",
+        "cache memory exhaustion",
+        "session store eviction"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka queue backlog",
+        "postgres connection pool"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-cache-006",
+        "pm-2026-03"
+      ],
+      "distractor_documents": [
+        "rb-queue-004",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "kafka distractor",
+        "wrong service match"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "notification-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 12,
+        "observed_avg": 2300.0,
+        "observed_max": 2760.0,
+        "observed_min": 1840.0,
+        "latest_value": 2300.0,
+        "raw_references": [
+          "event-LEX-04-01",
+          "event-LEX-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "notification-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 46.0
+      }
+    }
+  },
+  {
+    "scenario_id": "LEX-05",
+    "category_code": "C",
+    "scenario_class": "lexically_similar_distractors",
+    "incident": {
+      "incident_id": "INC-V2-LEX-05",
+      "created_at": "2026-10-03T12:58:47.140110Z",
+      "updated_at": "2026-10-03T12:58:47.140110Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-lex-05",
+      "trigger_rule_name": "Eviction Rate Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "e2170fe8-b2ed-4311-9c24-649999a02734",
+          "kind": "metric",
+          "description": "Observed cache.eviction_rate = 2500.000",
+          "value": 2500.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "cache.eviction_rate",
+            "threshold": 500.0
+          }
+        }
+      ],
+      "title": "Eviction Rate Spike on auth-service",
+      "description": "Automated alert: cache.eviction_rate observed at 2500.000, exceeding threshold 500.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-lex-05::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-LEX-05",
+      "scenario_class": "lexically_similar_distractors",
+      "expected_root_cause": "redis maxmemory policy key eviction",
+      "acceptable_root_causes": [
+        "redis eviction",
+        "cache memory exhaustion",
+        "session store eviction"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka queue backlog",
+        "postgres connection pool"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-cache-006",
+        "pm-2026-03"
+      ],
+      "distractor_documents": [
+        "rb-queue-004",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "kafka distractor",
+        "wrong service match"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 12,
+        "observed_avg": 2500.0,
+        "observed_max": 3000.0,
+        "observed_min": 2000.0,
+        "latest_value": 2500.0,
+        "raw_references": [
+          "event-LEX-05-01",
+          "event-LEX-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 50.0
+      }
+    }
+  },
+  {
+    "scenario_id": "LEX-06",
+    "category_code": "C",
+    "scenario_class": "lexically_similar_distractors",
+    "incident": {
+      "incident_id": "INC-V2-LEX-06",
+      "created_at": "2026-10-03T12:58:47.140123Z",
+      "updated_at": "2026-10-03T12:58:47.140123Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "notification-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-lex-06",
+      "trigger_rule_name": "Eviction Rate Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "e079d824-d829-4d78-8506-f39a9d4ba84d",
+          "kind": "metric",
+          "description": "Observed cache.eviction_rate = 2700.000",
+          "value": 2700.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "cache.eviction_rate",
+            "threshold": 500.0
+          }
+        }
+      ],
+      "title": "Eviction Rate Spike on notification-service",
+      "description": "Automated alert: cache.eviction_rate observed at 2700.000, exceeding threshold 500.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-lex-06::notification-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-LEX-06",
+      "scenario_class": "lexically_similar_distractors",
+      "expected_root_cause": "redis maxmemory policy key eviction",
+      "acceptable_root_causes": [
+        "redis eviction",
+        "cache memory exhaustion",
+        "session store eviction"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka queue backlog",
+        "postgres connection pool"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-cache-006",
+        "pm-2026-03"
+      ],
+      "distractor_documents": [
+        "rb-queue-004",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "kafka distractor",
+        "wrong service match"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "notification-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 12,
+        "observed_avg": 2700.0,
+        "observed_max": 3240.0,
+        "observed_min": 2160.0,
+        "latest_value": 2700.0,
+        "raw_references": [
+          "event-LEX-06-01",
+          "event-LEX-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "notification-service",
+        "metric": "cache.eviction_rate",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 54.0
+      }
+    }
+  },
+  {
+    "scenario_id": "MISS-01",
+    "category_code": "D",
+    "scenario_class": "missing_documentation",
+    "incident": {
+      "incident_id": "INC-V2-MISS-01",
+      "created_at": "2026-10-03T12:58:47.140136Z",
+      "updated_at": "2026-10-03T12:58:47.140136Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "analytics-pipeline",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-miss-01",
+      "trigger_rule_name": "Kernel Network Buffer Drop",
+      "initial_evidence": [
+        {
+          "evidence_id": "16b12184-b658-4fb9-9b1f-01a82b955ca8",
+          "kind": "metric",
+          "description": "Observed net.socket.udp_drops = 950.000",
+          "value": 950.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "net.socket.udp_drops",
+            "threshold": 100.0
+          }
+        }
+      ],
+      "title": "Kernel Network Buffer Drop on analytics-pipeline",
+      "description": "Automated alert: net.socket.udp_drops observed at 950.000, exceeding threshold 100.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-miss-01::analytics-pipeline::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-MISS-01",
+      "scenario_class": "missing_documentation",
+      "expected_root_cause": "undocumented kernel socket buffer exhaustion",
+      "acceptable_root_causes": [
+        "socket buffer drop",
+        "network buffer exhaustion",
+        "undocumented kernel drop"
+      ],
+      "required_evidence": [
+        "metric"
+      ],
+      "contradicting_evidence": [],
+      "expected_uncertainty": "insufficient_evidence",
+      "knowledge_documents_that_should_help": [],
+      "distractor_documents": [
+        "rb-net-008",
+        "pm-2026-07"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "fabricate runbook",
+        "hallucinate documented fix"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "analytics-pipeline",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 12,
+        "observed_avg": 950.0,
+        "observed_max": 1140.0,
+        "observed_min": 760.0,
+        "latest_value": 950.0,
+        "raw_references": [
+          "event-MISS-01-01",
+          "event-MISS-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "analytics-pipeline",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 30,
+        "baseline_avg": 5.0,
+        "baseline_stddev": 0.75,
+        "elevation_ratio": 190.0
+      }
+    }
+  },
+  {
+    "scenario_id": "MISS-02",
+    "category_code": "D",
+    "scenario_class": "missing_documentation",
+    "incident": {
+      "incident_id": "INC-V2-MISS-02",
+      "created_at": "2026-10-03T12:58:47.140149Z",
+      "updated_at": "2026-10-03T12:58:47.140149Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "billing-cron",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-miss-02",
+      "trigger_rule_name": "Kernel Network Buffer Drop",
+      "initial_evidence": [
+        {
+          "evidence_id": "8e4b6b93-7ea9-4afe-abad-88ae0de243bd",
+          "kind": "metric",
+          "description": "Observed net.socket.udp_drops = 1050.000",
+          "value": 1050.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "net.socket.udp_drops",
+            "threshold": 100.0
+          }
+        }
+      ],
+      "title": "Kernel Network Buffer Drop on billing-cron",
+      "description": "Automated alert: net.socket.udp_drops observed at 1050.000, exceeding threshold 100.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-miss-02::billing-cron::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-MISS-02",
+      "scenario_class": "missing_documentation",
+      "expected_root_cause": "undocumented kernel socket buffer exhaustion",
+      "acceptable_root_causes": [
+        "socket buffer drop",
+        "network buffer exhaustion",
+        "undocumented kernel drop"
+      ],
+      "required_evidence": [
+        "metric"
+      ],
+      "contradicting_evidence": [],
+      "expected_uncertainty": "insufficient_evidence",
+      "knowledge_documents_that_should_help": [],
+      "distractor_documents": [
+        "rb-net-008",
+        "pm-2026-07"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "fabricate runbook",
+        "hallucinate documented fix"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "billing-cron",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 12,
+        "observed_avg": 1050.0,
+        "observed_max": 1260.0,
+        "observed_min": 840.0,
+        "latest_value": 1050.0,
+        "raw_references": [
+          "event-MISS-02-01",
+          "event-MISS-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "billing-cron",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 30,
+        "baseline_avg": 5.0,
+        "baseline_stddev": 0.75,
+        "elevation_ratio": 210.0
+      }
+    }
+  },
+  {
+    "scenario_id": "MISS-03",
+    "category_code": "D",
+    "scenario_class": "missing_documentation",
+    "incident": {
+      "incident_id": "INC-V2-MISS-03",
+      "created_at": "2026-10-03T12:58:47.140162Z",
+      "updated_at": "2026-10-03T12:58:47.140162Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "analytics-pipeline",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-miss-03",
+      "trigger_rule_name": "Kernel Network Buffer Drop",
+      "initial_evidence": [
+        {
+          "evidence_id": "f77ac82f-e4d5-4725-a8bd-de7a34a08d34",
+          "kind": "metric",
+          "description": "Observed net.socket.udp_drops = 1150.000",
+          "value": 1150.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "net.socket.udp_drops",
+            "threshold": 100.0
+          }
+        }
+      ],
+      "title": "Kernel Network Buffer Drop on analytics-pipeline",
+      "description": "Automated alert: net.socket.udp_drops observed at 1150.000, exceeding threshold 100.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-miss-03::analytics-pipeline::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-MISS-03",
+      "scenario_class": "missing_documentation",
+      "expected_root_cause": "undocumented kernel socket buffer exhaustion",
+      "acceptable_root_causes": [
+        "socket buffer drop",
+        "network buffer exhaustion",
+        "undocumented kernel drop"
+      ],
+      "required_evidence": [
+        "metric"
+      ],
+      "contradicting_evidence": [],
+      "expected_uncertainty": "insufficient_evidence",
+      "knowledge_documents_that_should_help": [],
+      "distractor_documents": [
+        "rb-net-008",
+        "pm-2026-07"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "fabricate runbook",
+        "hallucinate documented fix"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "analytics-pipeline",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 12,
+        "observed_avg": 1150.0,
+        "observed_max": 1380.0,
+        "observed_min": 920.0,
+        "latest_value": 1150.0,
+        "raw_references": [
+          "event-MISS-03-01",
+          "event-MISS-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "analytics-pipeline",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 30,
+        "baseline_avg": 5.0,
+        "baseline_stddev": 0.75,
+        "elevation_ratio": 230.0
+      }
+    }
+  },
+  {
+    "scenario_id": "MISS-04",
+    "category_code": "D",
+    "scenario_class": "missing_documentation",
+    "incident": {
+      "incident_id": "INC-V2-MISS-04",
+      "created_at": "2026-10-03T12:58:47.140175Z",
+      "updated_at": "2026-10-03T12:58:47.140175Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "billing-cron",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-miss-04",
+      "trigger_rule_name": "Kernel Network Buffer Drop",
+      "initial_evidence": [
+        {
+          "evidence_id": "432c2a97-63bf-4ab8-a2c0-376b500f0b78",
+          "kind": "metric",
+          "description": "Observed net.socket.udp_drops = 1250.000",
+          "value": 1250.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "net.socket.udp_drops",
+            "threshold": 100.0
+          }
+        }
+      ],
+      "title": "Kernel Network Buffer Drop on billing-cron",
+      "description": "Automated alert: net.socket.udp_drops observed at 1250.000, exceeding threshold 100.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-miss-04::billing-cron::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-MISS-04",
+      "scenario_class": "missing_documentation",
+      "expected_root_cause": "undocumented kernel socket buffer exhaustion",
+      "acceptable_root_causes": [
+        "socket buffer drop",
+        "network buffer exhaustion",
+        "undocumented kernel drop"
+      ],
+      "required_evidence": [
+        "metric"
+      ],
+      "contradicting_evidence": [],
+      "expected_uncertainty": "insufficient_evidence",
+      "knowledge_documents_that_should_help": [],
+      "distractor_documents": [
+        "rb-net-008",
+        "pm-2026-07"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "fabricate runbook",
+        "hallucinate documented fix"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "billing-cron",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 12,
+        "observed_avg": 1250.0,
+        "observed_max": 1500.0,
+        "observed_min": 1000.0,
+        "latest_value": 1250.0,
+        "raw_references": [
+          "event-MISS-04-01",
+          "event-MISS-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "billing-cron",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 30,
+        "baseline_avg": 5.0,
+        "baseline_stddev": 0.75,
+        "elevation_ratio": 250.0
+      }
+    }
+  },
+  {
+    "scenario_id": "MISS-05",
+    "category_code": "D",
+    "scenario_class": "missing_documentation",
+    "incident": {
+      "incident_id": "INC-V2-MISS-05",
+      "created_at": "2026-10-03T12:58:47.140187Z",
+      "updated_at": "2026-10-03T12:58:47.140187Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "analytics-pipeline",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-miss-05",
+      "trigger_rule_name": "Kernel Network Buffer Drop",
+      "initial_evidence": [
+        {
+          "evidence_id": "bba009de-fb3d-4293-8158-51efa57b51b7",
+          "kind": "metric",
+          "description": "Observed net.socket.udp_drops = 1350.000",
+          "value": 1350.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "net.socket.udp_drops",
+            "threshold": 100.0
+          }
+        }
+      ],
+      "title": "Kernel Network Buffer Drop on analytics-pipeline",
+      "description": "Automated alert: net.socket.udp_drops observed at 1350.000, exceeding threshold 100.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-miss-05::analytics-pipeline::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-MISS-05",
+      "scenario_class": "missing_documentation",
+      "expected_root_cause": "undocumented kernel socket buffer exhaustion",
+      "acceptable_root_causes": [
+        "socket buffer drop",
+        "network buffer exhaustion",
+        "undocumented kernel drop"
+      ],
+      "required_evidence": [
+        "metric"
+      ],
+      "contradicting_evidence": [],
+      "expected_uncertainty": "insufficient_evidence",
+      "knowledge_documents_that_should_help": [],
+      "distractor_documents": [
+        "rb-net-008",
+        "pm-2026-07"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "fabricate runbook",
+        "hallucinate documented fix"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "analytics-pipeline",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 12,
+        "observed_avg": 1350.0,
+        "observed_max": 1620.0,
+        "observed_min": 1080.0,
+        "latest_value": 1350.0,
+        "raw_references": [
+          "event-MISS-05-01",
+          "event-MISS-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "analytics-pipeline",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 30,
+        "baseline_avg": 5.0,
+        "baseline_stddev": 0.75,
+        "elevation_ratio": 270.0
+      }
+    }
+  },
+  {
+    "scenario_id": "MISS-06",
+    "category_code": "D",
+    "scenario_class": "missing_documentation",
+    "incident": {
+      "incident_id": "INC-V2-MISS-06",
+      "created_at": "2026-10-03T12:58:47.140198Z",
+      "updated_at": "2026-10-03T12:58:47.140198Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "billing-cron",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-miss-06",
+      "trigger_rule_name": "Kernel Network Buffer Drop",
+      "initial_evidence": [
+        {
+          "evidence_id": "6e1df348-26c6-4845-b6a5-b0e4af3fa008",
+          "kind": "metric",
+          "description": "Observed net.socket.udp_drops = 1450.000",
+          "value": 1450.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "net.socket.udp_drops",
+            "threshold": 100.0
+          }
+        }
+      ],
+      "title": "Kernel Network Buffer Drop on billing-cron",
+      "description": "Automated alert: net.socket.udp_drops observed at 1450.000, exceeding threshold 100.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-miss-06::billing-cron::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-MISS-06",
+      "scenario_class": "missing_documentation",
+      "expected_root_cause": "undocumented kernel socket buffer exhaustion",
+      "acceptable_root_causes": [
+        "socket buffer drop",
+        "network buffer exhaustion",
+        "undocumented kernel drop"
+      ],
+      "required_evidence": [
+        "metric"
+      ],
+      "contradicting_evidence": [],
+      "expected_uncertainty": "insufficient_evidence",
+      "knowledge_documents_that_should_help": [],
+      "distractor_documents": [
+        "rb-net-008",
+        "pm-2026-07"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "fabricate runbook",
+        "hallucinate documented fix"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "billing-cron",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 12,
+        "observed_avg": 1450.0,
+        "observed_max": 1740.0,
+        "observed_min": 1160.0,
+        "latest_value": 1450.0,
+        "raw_references": [
+          "event-MISS-06-01",
+          "event-MISS-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "billing-cron",
+        "metric": "net.socket.udp_drops",
+        "sample_count": 30,
+        "baseline_avg": 5.0,
+        "baseline_stddev": 0.75,
+        "elevation_ratio": 290.0
+      }
+    }
+  },
+  {
+    "scenario_id": "VER-01",
+    "category_code": "E",
+    "scenario_class": "version_specific_failure",
+    "incident": {
+      "incident_id": "INC-V2-VER-01",
+      "created_at": "2026-10-03T12:58:47.140210Z",
+      "updated_at": "2026-10-03T12:58:47.140210Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-ver-01",
+      "trigger_rule_name": "Payment Gateway Timeout",
+      "initial_evidence": [
+        {
+          "evidence_id": "f7328d19-aa7b-441b-a101-9f06beebb854",
+          "kind": "metric",
+          "description": "Observed payment.gateway.timeout_rate = 0.390",
+          "value": 0.38999999999999996,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "payment.gateway.timeout_rate",
+            "threshold": 0.1
+          }
+        }
+      ],
+      "title": "Payment Gateway Timeout on payments-service",
+      "description": "Automated alert: payment.gateway.timeout_rate observed at 0.390, exceeding threshold 0.100",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-ver-01::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-VER-01",
+      "scenario_class": "version_specific_failure",
+      "expected_root_cause": "http client connection leak in v2.4.0",
+      "acceptable_root_causes": [
+        "v2.4.0 regression",
+        "gateway timeout in v2.4.0",
+        "connection leak in release 2.4.0"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v2.3.9 stable release"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-01"
+      ],
+      "distractor_documents": [
+        "rel-002"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "v2.3.9 was culprit"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 12,
+        "observed_avg": 0.38999999999999996,
+        "observed_max": 0.4679999999999999,
+        "observed_min": 0.312,
+        "latest_value": 0.38999999999999996,
+        "raw_references": [
+          "event-VER-01-01",
+          "event-VER-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 7.8
+      }
+    }
+  },
+  {
+    "scenario_id": "VER-02",
+    "category_code": "E",
+    "scenario_class": "version_specific_failure",
+    "incident": {
+      "incident_id": "INC-V2-VER-02",
+      "created_at": "2026-10-03T12:58:47.140222Z",
+      "updated_at": "2026-10-03T12:58:47.140222Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-ver-02",
+      "trigger_rule_name": "Payment Gateway Timeout",
+      "initial_evidence": [
+        {
+          "evidence_id": "5118b5d0-faf8-4d03-90db-99bf64325bcc",
+          "kind": "metric",
+          "description": "Observed payment.gateway.timeout_rate = 0.430",
+          "value": 0.43,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "payment.gateway.timeout_rate",
+            "threshold": 0.1
+          }
+        }
+      ],
+      "title": "Payment Gateway Timeout on payments-service",
+      "description": "Automated alert: payment.gateway.timeout_rate observed at 0.430, exceeding threshold 0.100",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-ver-02::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-VER-02",
+      "scenario_class": "version_specific_failure",
+      "expected_root_cause": "http client connection leak in v2.4.0",
+      "acceptable_root_causes": [
+        "v2.4.0 regression",
+        "gateway timeout in v2.4.0",
+        "connection leak in release 2.4.0"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v2.3.9 stable release"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-01"
+      ],
+      "distractor_documents": [
+        "rel-002"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "v2.3.9 was culprit"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 12,
+        "observed_avg": 0.43,
+        "observed_max": 0.516,
+        "observed_min": 0.34400000000000003,
+        "latest_value": 0.43,
+        "raw_references": [
+          "event-VER-02-01",
+          "event-VER-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 8.6
+      }
+    }
+  },
+  {
+    "scenario_id": "VER-03",
+    "category_code": "E",
+    "scenario_class": "version_specific_failure",
+    "incident": {
+      "incident_id": "INC-V2-VER-03",
+      "created_at": "2026-10-03T12:58:47.140233Z",
+      "updated_at": "2026-10-03T12:58:47.140233Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-ver-03",
+      "trigger_rule_name": "Payment Gateway Timeout",
+      "initial_evidence": [
+        {
+          "evidence_id": "8349df3c-7158-45a3-be68-07ecefbad831",
+          "kind": "metric",
+          "description": "Observed payment.gateway.timeout_rate = 0.470",
+          "value": 0.47,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "payment.gateway.timeout_rate",
+            "threshold": 0.1
+          }
+        }
+      ],
+      "title": "Payment Gateway Timeout on payments-service",
+      "description": "Automated alert: payment.gateway.timeout_rate observed at 0.470, exceeding threshold 0.100",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-ver-03::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-VER-03",
+      "scenario_class": "version_specific_failure",
+      "expected_root_cause": "http client connection leak in v2.4.0",
+      "acceptable_root_causes": [
+        "v2.4.0 regression",
+        "gateway timeout in v2.4.0",
+        "connection leak in release 2.4.0"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v2.3.9 stable release"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-01"
+      ],
+      "distractor_documents": [
+        "rel-002"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "v2.3.9 was culprit"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 12,
+        "observed_avg": 0.47,
+        "observed_max": 0.564,
+        "observed_min": 0.376,
+        "latest_value": 0.47,
+        "raw_references": [
+          "event-VER-03-01",
+          "event-VER-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 9.4
+      }
+    }
+  },
+  {
+    "scenario_id": "VER-04",
+    "category_code": "E",
+    "scenario_class": "version_specific_failure",
+    "incident": {
+      "incident_id": "INC-V2-VER-04",
+      "created_at": "2026-10-03T12:58:47.140244Z",
+      "updated_at": "2026-10-03T12:58:47.140244Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-ver-04",
+      "trigger_rule_name": "Payment Gateway Timeout",
+      "initial_evidence": [
+        {
+          "evidence_id": "b684e860-2745-4061-a930-67c721b6999b",
+          "kind": "metric",
+          "description": "Observed payment.gateway.timeout_rate = 0.510",
+          "value": 0.51,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "payment.gateway.timeout_rate",
+            "threshold": 0.1
+          }
+        }
+      ],
+      "title": "Payment Gateway Timeout on payments-service",
+      "description": "Automated alert: payment.gateway.timeout_rate observed at 0.510, exceeding threshold 0.100",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-ver-04::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-VER-04",
+      "scenario_class": "version_specific_failure",
+      "expected_root_cause": "http client connection leak in v2.4.0",
+      "acceptable_root_causes": [
+        "v2.4.0 regression",
+        "gateway timeout in v2.4.0",
+        "connection leak in release 2.4.0"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v2.3.9 stable release"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-01"
+      ],
+      "distractor_documents": [
+        "rel-002"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "v2.3.9 was culprit"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 12,
+        "observed_avg": 0.51,
+        "observed_max": 0.612,
+        "observed_min": 0.40800000000000003,
+        "latest_value": 0.51,
+        "raw_references": [
+          "event-VER-04-01",
+          "event-VER-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 10.2
+      }
+    }
+  },
+  {
+    "scenario_id": "VER-05",
+    "category_code": "E",
+    "scenario_class": "version_specific_failure",
+    "incident": {
+      "incident_id": "INC-V2-VER-05",
+      "created_at": "2026-10-03T12:58:47.140255Z",
+      "updated_at": "2026-10-03T12:58:47.140255Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-ver-05",
+      "trigger_rule_name": "Payment Gateway Timeout",
+      "initial_evidence": [
+        {
+          "evidence_id": "ae484fb5-e03b-42f7-8372-1794697a9d50",
+          "kind": "metric",
+          "description": "Observed payment.gateway.timeout_rate = 0.550",
+          "value": 0.55,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "payment.gateway.timeout_rate",
+            "threshold": 0.1
+          }
+        }
+      ],
+      "title": "Payment Gateway Timeout on payments-service",
+      "description": "Automated alert: payment.gateway.timeout_rate observed at 0.550, exceeding threshold 0.100",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-ver-05::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-VER-05",
+      "scenario_class": "version_specific_failure",
+      "expected_root_cause": "http client connection leak in v2.4.0",
+      "acceptable_root_causes": [
+        "v2.4.0 regression",
+        "gateway timeout in v2.4.0",
+        "connection leak in release 2.4.0"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v2.3.9 stable release"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-01"
+      ],
+      "distractor_documents": [
+        "rel-002"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "v2.3.9 was culprit"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 12,
+        "observed_avg": 0.55,
+        "observed_max": 0.66,
+        "observed_min": 0.44000000000000006,
+        "latest_value": 0.55,
+        "raw_references": [
+          "event-VER-05-01",
+          "event-VER-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 11.0
+      }
+    }
+  },
+  {
+    "scenario_id": "VER-06",
+    "category_code": "E",
+    "scenario_class": "version_specific_failure",
+    "incident": {
+      "incident_id": "INC-V2-VER-06",
+      "created_at": "2026-10-03T12:58:47.140266Z",
+      "updated_at": "2026-10-03T12:58:47.140266Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "payments-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-ver-06",
+      "trigger_rule_name": "Payment Gateway Timeout",
+      "initial_evidence": [
+        {
+          "evidence_id": "a13e2415-bc6c-42e1-ace7-81924fa36c5f",
+          "kind": "metric",
+          "description": "Observed payment.gateway.timeout_rate = 0.590",
+          "value": 0.59,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "payment.gateway.timeout_rate",
+            "threshold": 0.1
+          }
+        }
+      ],
+      "title": "Payment Gateway Timeout on payments-service",
+      "description": "Automated alert: payment.gateway.timeout_rate observed at 0.590, exceeding threshold 0.100",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-ver-06::payments-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-VER-06",
+      "scenario_class": "version_specific_failure",
+      "expected_root_cause": "http client connection leak in v2.4.0",
+      "acceptable_root_causes": [
+        "v2.4.0 regression",
+        "gateway timeout in v2.4.0",
+        "connection leak in release 2.4.0"
+      ],
+      "required_evidence": [
+        "metric",
+        "release"
+      ],
+      "contradicting_evidence": [
+        "v2.3.9 stable release"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rel-003",
+        "pm-2026-01"
+      ],
+      "distractor_documents": [
+        "rel-002"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "v2.3.9 was culprit"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 12,
+        "observed_avg": 0.59,
+        "observed_max": 0.708,
+        "observed_min": 0.472,
+        "latest_value": 0.59,
+        "raw_references": [
+          "event-VER-06-01",
+          "event-VER-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "payments-service",
+        "metric": "payment.gateway.timeout_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 11.8
+      }
+    }
+  },
+  {
+    "scenario_id": "HYP-01",
+    "category_code": "F",
+    "scenario_class": "multiple_plausible_hypotheses",
+    "incident": {
+      "incident_id": "INC-V2-HYP-01",
+      "created_at": "2026-10-03T12:58:47.140277Z",
+      "updated_at": "2026-10-03T12:58:47.140277Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-hyp-01",
+      "trigger_rule_name": "JVM CPU Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "d995e133-c624-4ebc-ab58-fc64d7e4bef6",
+          "kind": "metric",
+          "description": "Observed jvm.cpu.utilization = 0.930",
+          "value": 0.93,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "jvm.cpu.utilization",
+            "threshold": 0.8
+          }
+        }
+      ],
+      "title": "JVM CPU Saturation on order-service",
+      "description": "Automated alert: jvm.cpu.utilization observed at 0.930, exceeding threshold 0.800",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-hyp-01::order-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-HYP-01",
+      "scenario_class": "multiple_plausible_hypotheses",
+      "expected_root_cause": "concurrent mark-sweep gc pause loop",
+      "acceptable_root_causes": [
+        "gc pause",
+        "garbage collection pause",
+        "jvm metaspace gc freeze"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "infinite while loop in application code"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-jvm-010"
+      ],
+      "distractor_documents": [
+        "rb-deploy-005"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "unsupported thread leak hypothesis"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.93,
+        "observed_max": 1.116,
+        "observed_min": 0.7440000000000001,
+        "latest_value": 0.93,
+        "raw_references": [
+          "event-HYP-01-01",
+          "event-HYP-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.3,
+        "baseline_stddev": 0.045,
+        "elevation_ratio": 3.1
+      }
+    }
+  },
+  {
+    "scenario_id": "HYP-02",
+    "category_code": "F",
+    "scenario_class": "multiple_plausible_hypotheses",
+    "incident": {
+      "incident_id": "INC-V2-HYP-02",
+      "created_at": "2026-10-03T12:58:47.140289Z",
+      "updated_at": "2026-10-03T12:58:47.140289Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "inventory-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-hyp-02",
+      "trigger_rule_name": "JVM CPU Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "bc5ca4d2-c0c0-468b-95a9-a665e58f2189",
+          "kind": "metric",
+          "description": "Observed jvm.cpu.utilization = 0.940",
+          "value": 0.9400000000000001,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "jvm.cpu.utilization",
+            "threshold": 0.8
+          }
+        }
+      ],
+      "title": "JVM CPU Saturation on inventory-service",
+      "description": "Automated alert: jvm.cpu.utilization observed at 0.940, exceeding threshold 0.800",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-hyp-02::inventory-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-HYP-02",
+      "scenario_class": "multiple_plausible_hypotheses",
+      "expected_root_cause": "concurrent mark-sweep gc pause loop",
+      "acceptable_root_causes": [
+        "gc pause",
+        "garbage collection pause",
+        "jvm metaspace gc freeze"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "infinite while loop in application code"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-jvm-010"
+      ],
+      "distractor_documents": [
+        "rb-deploy-005"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "unsupported thread leak hypothesis"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "inventory-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.9400000000000001,
+        "observed_max": 1.1280000000000001,
+        "observed_min": 0.7520000000000001,
+        "latest_value": 0.9400000000000001,
+        "raw_references": [
+          "event-HYP-02-01",
+          "event-HYP-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "inventory-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.3,
+        "baseline_stddev": 0.045,
+        "elevation_ratio": 3.13
+      }
+    }
+  },
+  {
+    "scenario_id": "HYP-03",
+    "category_code": "F",
+    "scenario_class": "multiple_plausible_hypotheses",
+    "incident": {
+      "incident_id": "INC-V2-HYP-03",
+      "created_at": "2026-10-03T12:58:47.140302Z",
+      "updated_at": "2026-10-03T12:58:47.140302Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-hyp-03",
+      "trigger_rule_name": "JVM CPU Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "d5bfef99-b375-4bc0-8159-956b34a0a235",
+          "kind": "metric",
+          "description": "Observed jvm.cpu.utilization = 0.950",
+          "value": 0.9500000000000001,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "jvm.cpu.utilization",
+            "threshold": 0.8
+          }
+        }
+      ],
+      "title": "JVM CPU Saturation on order-service",
+      "description": "Automated alert: jvm.cpu.utilization observed at 0.950, exceeding threshold 0.800",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-hyp-03::order-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-HYP-03",
+      "scenario_class": "multiple_plausible_hypotheses",
+      "expected_root_cause": "concurrent mark-sweep gc pause loop",
+      "acceptable_root_causes": [
+        "gc pause",
+        "garbage collection pause",
+        "jvm metaspace gc freeze"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "infinite while loop in application code"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-jvm-010"
+      ],
+      "distractor_documents": [
+        "rb-deploy-005"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "unsupported thread leak hypothesis"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.9500000000000001,
+        "observed_max": 1.1400000000000001,
+        "observed_min": 0.7600000000000001,
+        "latest_value": 0.9500000000000001,
+        "raw_references": [
+          "event-HYP-03-01",
+          "event-HYP-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.3,
+        "baseline_stddev": 0.045,
+        "elevation_ratio": 3.17
+      }
+    }
+  },
+  {
+    "scenario_id": "HYP-04",
+    "category_code": "F",
+    "scenario_class": "multiple_plausible_hypotheses",
+    "incident": {
+      "incident_id": "INC-V2-HYP-04",
+      "created_at": "2026-10-03T12:58:47.140313Z",
+      "updated_at": "2026-10-03T12:58:47.140313Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "inventory-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-hyp-04",
+      "trigger_rule_name": "JVM CPU Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "b3bc5380-23d6-4484-8d95-a007f02c593e",
+          "kind": "metric",
+          "description": "Observed jvm.cpu.utilization = 0.960",
+          "value": 0.9600000000000001,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "jvm.cpu.utilization",
+            "threshold": 0.8
+          }
+        }
+      ],
+      "title": "JVM CPU Saturation on inventory-service",
+      "description": "Automated alert: jvm.cpu.utilization observed at 0.960, exceeding threshold 0.800",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-hyp-04::inventory-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-HYP-04",
+      "scenario_class": "multiple_plausible_hypotheses",
+      "expected_root_cause": "concurrent mark-sweep gc pause loop",
+      "acceptable_root_causes": [
+        "gc pause",
+        "garbage collection pause",
+        "jvm metaspace gc freeze"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "infinite while loop in application code"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-jvm-010"
+      ],
+      "distractor_documents": [
+        "rb-deploy-005"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "unsupported thread leak hypothesis"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "inventory-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.9600000000000001,
+        "observed_max": 1.1520000000000001,
+        "observed_min": 0.7680000000000001,
+        "latest_value": 0.9600000000000001,
+        "raw_references": [
+          "event-HYP-04-01",
+          "event-HYP-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "inventory-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.3,
+        "baseline_stddev": 0.045,
+        "elevation_ratio": 3.2
+      }
+    }
+  },
+  {
+    "scenario_id": "HYP-05",
+    "category_code": "F",
+    "scenario_class": "multiple_plausible_hypotheses",
+    "incident": {
+      "incident_id": "INC-V2-HYP-05",
+      "created_at": "2026-10-03T12:58:47.140324Z",
+      "updated_at": "2026-10-03T12:58:47.140324Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-hyp-05",
+      "trigger_rule_name": "JVM CPU Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "c3258493-54f9-41c9-8c1d-cedaa936019f",
+          "kind": "metric",
+          "description": "Observed jvm.cpu.utilization = 0.970",
+          "value": 0.9700000000000001,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "jvm.cpu.utilization",
+            "threshold": 0.8
+          }
+        }
+      ],
+      "title": "JVM CPU Saturation on order-service",
+      "description": "Automated alert: jvm.cpu.utilization observed at 0.970, exceeding threshold 0.800",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-hyp-05::order-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-HYP-05",
+      "scenario_class": "multiple_plausible_hypotheses",
+      "expected_root_cause": "concurrent mark-sweep gc pause loop",
+      "acceptable_root_causes": [
+        "gc pause",
+        "garbage collection pause",
+        "jvm metaspace gc freeze"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "infinite while loop in application code"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-jvm-010"
+      ],
+      "distractor_documents": [
+        "rb-deploy-005"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "unsupported thread leak hypothesis"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.9700000000000001,
+        "observed_max": 1.1640000000000001,
+        "observed_min": 0.7760000000000001,
+        "latest_value": 0.9700000000000001,
+        "raw_references": [
+          "event-HYP-05-01",
+          "event-HYP-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.3,
+        "baseline_stddev": 0.045,
+        "elevation_ratio": 3.23
+      }
+    }
+  },
+  {
+    "scenario_id": "HYP-06",
+    "category_code": "F",
+    "scenario_class": "multiple_plausible_hypotheses",
+    "incident": {
+      "incident_id": "INC-V2-HYP-06",
+      "created_at": "2026-10-03T12:58:47.140336Z",
+      "updated_at": "2026-10-03T12:58:47.140336Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "inventory-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-hyp-06",
+      "trigger_rule_name": "JVM CPU Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "fe7e1a8f-32a4-4db5-8a55-a4b501b9b868",
+          "kind": "metric",
+          "description": "Observed jvm.cpu.utilization = 0.980",
+          "value": 0.98,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "jvm.cpu.utilization",
+            "threshold": 0.8
+          }
+        }
+      ],
+      "title": "JVM CPU Saturation on inventory-service",
+      "description": "Automated alert: jvm.cpu.utilization observed at 0.980, exceeding threshold 0.800",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-hyp-06::inventory-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-HYP-06",
+      "scenario_class": "multiple_plausible_hypotheses",
+      "expected_root_cause": "concurrent mark-sweep gc pause loop",
+      "acceptable_root_causes": [
+        "gc pause",
+        "garbage collection pause",
+        "jvm metaspace gc freeze"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "infinite while loop in application code"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-jvm-010"
+      ],
+      "distractor_documents": [
+        "rb-deploy-005"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "unsupported thread leak hypothesis"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "inventory-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.98,
+        "observed_max": 1.176,
+        "observed_min": 0.784,
+        "latest_value": 0.98,
+        "raw_references": [
+          "event-HYP-06-01",
+          "event-HYP-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "inventory-service",
+        "metric": "jvm.cpu.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.3,
+        "baseline_stddev": 0.045,
+        "elevation_ratio": 3.27
+      }
+    }
+  },
+  {
+    "scenario_id": "CONTRA-01",
+    "category_code": "G",
+    "scenario_class": "contradictory_telemetry",
+    "incident": {
+      "incident_id": "INC-V2-CONTRA-01",
+      "created_at": "2026-10-03T12:58:47.140348Z",
+      "updated_at": "2026-10-03T12:58:47.140348Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "edge-gateway",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-contra-01",
+      "trigger_rule_name": "Edge 502 Bad Gateway Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "a6230952-1e64-47b4-8835-7905649c414f",
+          "kind": "metric",
+          "description": "Observed http.client.502_ratio = 0.310",
+          "value": 0.31000000000000005,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.client.502_ratio",
+            "threshold": 0.05
+          }
+        }
+      ],
+      "title": "Edge 502 Bad Gateway Spike on edge-gateway",
+      "description": "Automated alert: http.client.502_ratio observed at 0.310, exceeding threshold 0.050",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-contra-01::edge-gateway::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONTRA-01",
+      "scenario_class": "contradictory_telemetry",
+      "expected_root_cause": "keepalive timeout race between proxy and upstream",
+      "acceptable_root_causes": [
+        "keepalive timeout mismatch",
+        "upstream connection reset",
+        "502 proxy race"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "upstream crashed"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-net-008"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conclude upstream dead"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 12,
+        "observed_avg": 0.31000000000000005,
+        "observed_max": 0.37200000000000005,
+        "observed_min": 0.24800000000000005,
+        "latest_value": 0.31000000000000005,
+        "raw_references": [
+          "event-CONTRA-01-01",
+          "event-CONTRA-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 6.2
+      }
+    }
+  },
+  {
+    "scenario_id": "CONTRA-02",
+    "category_code": "G",
+    "scenario_class": "contradictory_telemetry",
+    "incident": {
+      "incident_id": "INC-V2-CONTRA-02",
+      "created_at": "2026-10-03T12:58:47.140359Z",
+      "updated_at": "2026-10-03T12:58:47.140359Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "edge-gateway",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-contra-02",
+      "trigger_rule_name": "Edge 502 Bad Gateway Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "3ac8e078-2965-49c1-bcf3-100590d514c1",
+          "kind": "metric",
+          "description": "Observed http.client.502_ratio = 0.340",
+          "value": 0.34,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.client.502_ratio",
+            "threshold": 0.05
+          }
+        }
+      ],
+      "title": "Edge 502 Bad Gateway Spike on edge-gateway",
+      "description": "Automated alert: http.client.502_ratio observed at 0.340, exceeding threshold 0.050",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-contra-02::edge-gateway::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONTRA-02",
+      "scenario_class": "contradictory_telemetry",
+      "expected_root_cause": "keepalive timeout race between proxy and upstream",
+      "acceptable_root_causes": [
+        "keepalive timeout mismatch",
+        "upstream connection reset",
+        "502 proxy race"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "upstream crashed"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-net-008"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conclude upstream dead"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 12,
+        "observed_avg": 0.34,
+        "observed_max": 0.40800000000000003,
+        "observed_min": 0.272,
+        "latest_value": 0.34,
+        "raw_references": [
+          "event-CONTRA-02-01",
+          "event-CONTRA-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 6.8
+      }
+    }
+  },
+  {
+    "scenario_id": "CONTRA-03",
+    "category_code": "G",
+    "scenario_class": "contradictory_telemetry",
+    "incident": {
+      "incident_id": "INC-V2-CONTRA-03",
+      "created_at": "2026-10-03T12:58:47.140371Z",
+      "updated_at": "2026-10-03T12:58:47.140371Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "edge-gateway",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-contra-03",
+      "trigger_rule_name": "Edge 502 Bad Gateway Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "82d6bd2c-e193-45f3-95f4-4ce84b2f83e2",
+          "kind": "metric",
+          "description": "Observed http.client.502_ratio = 0.370",
+          "value": 0.37,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.client.502_ratio",
+            "threshold": 0.05
+          }
+        }
+      ],
+      "title": "Edge 502 Bad Gateway Spike on edge-gateway",
+      "description": "Automated alert: http.client.502_ratio observed at 0.370, exceeding threshold 0.050",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-contra-03::edge-gateway::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONTRA-03",
+      "scenario_class": "contradictory_telemetry",
+      "expected_root_cause": "keepalive timeout race between proxy and upstream",
+      "acceptable_root_causes": [
+        "keepalive timeout mismatch",
+        "upstream connection reset",
+        "502 proxy race"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "upstream crashed"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-net-008"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conclude upstream dead"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 12,
+        "observed_avg": 0.37,
+        "observed_max": 0.444,
+        "observed_min": 0.296,
+        "latest_value": 0.37,
+        "raw_references": [
+          "event-CONTRA-03-01",
+          "event-CONTRA-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 7.4
+      }
+    }
+  },
+  {
+    "scenario_id": "CONTRA-04",
+    "category_code": "G",
+    "scenario_class": "contradictory_telemetry",
+    "incident": {
+      "incident_id": "INC-V2-CONTRA-04",
+      "created_at": "2026-10-03T12:58:47.140382Z",
+      "updated_at": "2026-10-03T12:58:47.140382Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "edge-gateway",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-contra-04",
+      "trigger_rule_name": "Edge 502 Bad Gateway Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "268326b6-48de-4aae-8d29-766f29ba670c",
+          "kind": "metric",
+          "description": "Observed http.client.502_ratio = 0.400",
+          "value": 0.4,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.client.502_ratio",
+            "threshold": 0.05
+          }
+        }
+      ],
+      "title": "Edge 502 Bad Gateway Spike on edge-gateway",
+      "description": "Automated alert: http.client.502_ratio observed at 0.400, exceeding threshold 0.050",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-contra-04::edge-gateway::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONTRA-04",
+      "scenario_class": "contradictory_telemetry",
+      "expected_root_cause": "keepalive timeout race between proxy and upstream",
+      "acceptable_root_causes": [
+        "keepalive timeout mismatch",
+        "upstream connection reset",
+        "502 proxy race"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "upstream crashed"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-net-008"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conclude upstream dead"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 12,
+        "observed_avg": 0.4,
+        "observed_max": 0.48,
+        "observed_min": 0.32000000000000006,
+        "latest_value": 0.4,
+        "raw_references": [
+          "event-CONTRA-04-01",
+          "event-CONTRA-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 8.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CONTRA-05",
+    "category_code": "G",
+    "scenario_class": "contradictory_telemetry",
+    "incident": {
+      "incident_id": "INC-V2-CONTRA-05",
+      "created_at": "2026-10-03T12:58:47.140393Z",
+      "updated_at": "2026-10-03T12:58:47.140393Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "edge-gateway",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-contra-05",
+      "trigger_rule_name": "Edge 502 Bad Gateway Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "f2e276d0-42a7-4ce0-8e40-4dceafe72ba9",
+          "kind": "metric",
+          "description": "Observed http.client.502_ratio = 0.430",
+          "value": 0.43000000000000005,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.client.502_ratio",
+            "threshold": 0.05
+          }
+        }
+      ],
+      "title": "Edge 502 Bad Gateway Spike on edge-gateway",
+      "description": "Automated alert: http.client.502_ratio observed at 0.430, exceeding threshold 0.050",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-contra-05::edge-gateway::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONTRA-05",
+      "scenario_class": "contradictory_telemetry",
+      "expected_root_cause": "keepalive timeout race between proxy and upstream",
+      "acceptable_root_causes": [
+        "keepalive timeout mismatch",
+        "upstream connection reset",
+        "502 proxy race"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "upstream crashed"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-net-008"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conclude upstream dead"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 12,
+        "observed_avg": 0.43000000000000005,
+        "observed_max": 0.516,
+        "observed_min": 0.3440000000000001,
+        "latest_value": 0.43000000000000005,
+        "raw_references": [
+          "event-CONTRA-05-01",
+          "event-CONTRA-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 8.6
+      }
+    }
+  },
+  {
+    "scenario_id": "CONTRA-06",
+    "category_code": "G",
+    "scenario_class": "contradictory_telemetry",
+    "incident": {
+      "incident_id": "INC-V2-CONTRA-06",
+      "created_at": "2026-10-03T12:58:47.140555Z",
+      "updated_at": "2026-10-03T12:58:47.140555Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "edge-gateway",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-contra-06",
+      "trigger_rule_name": "Edge 502 Bad Gateway Spike",
+      "initial_evidence": [
+        {
+          "evidence_id": "f3da6fee-c7c9-4828-8d68-f3102ea98f92",
+          "kind": "metric",
+          "description": "Observed http.client.502_ratio = 0.460",
+          "value": 0.46,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "http.client.502_ratio",
+            "threshold": 0.05
+          }
+        }
+      ],
+      "title": "Edge 502 Bad Gateway Spike on edge-gateway",
+      "description": "Automated alert: http.client.502_ratio observed at 0.460, exceeding threshold 0.050",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-contra-06::edge-gateway::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CONTRA-06",
+      "scenario_class": "contradictory_telemetry",
+      "expected_root_cause": "keepalive timeout race between proxy and upstream",
+      "acceptable_root_causes": [
+        "keepalive timeout mismatch",
+        "upstream connection reset",
+        "502 proxy race"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "upstream crashed"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-net-008"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "conclude upstream dead"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 12,
+        "observed_avg": 0.46,
+        "observed_max": 0.552,
+        "observed_min": 0.36800000000000005,
+        "latest_value": 0.46,
+        "raw_references": [
+          "event-CONTRA-06-01",
+          "event-CONTRA-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "edge-gateway",
+        "metric": "http.client.502_ratio",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 9.2
+      }
+    }
+  },
+  {
+    "scenario_id": "IRREL-01",
+    "category_code": "H",
+    "scenario_class": "irrelevant_top_knowledge",
+    "incident": {
+      "incident_id": "INC-V2-IRREL-01",
+      "created_at": "2026-10-03T12:58:47.140571Z",
+      "updated_at": "2026-10-03T12:58:47.140571Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "user-profile-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-irrel-01",
+      "trigger_rule_name": "Disk IO Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "a1c45992-d7dc-4d54-845c-01f1e2972bd8",
+          "kind": "metric",
+          "description": "Observed disk.io.utilization = 0.958",
+          "value": 0.958,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "disk.io.utilization",
+            "threshold": 0.85
+          }
+        }
+      ],
+      "title": "Disk IO Saturation on user-profile-service",
+      "description": "Automated alert: disk.io.utilization observed at 0.958, exceeding threshold 0.850",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-irrel-01::user-profile-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-IRREL-01",
+      "scenario_class": "irrelevant_top_knowledge",
+      "expected_root_cause": "unbounded debug log rotation writing to root volume",
+      "acceptable_root_causes": [
+        "unbounded log file growth",
+        "debug logging disk fill",
+        "log volume saturation"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "database tablespace exhaustion"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-disk-009"
+      ],
+      "distractor_documents": [
+        "arch-003",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "database storage failure on stateless service"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.958,
+        "observed_max": 1.1496,
+        "observed_min": 0.7664,
+        "latest_value": 0.958,
+        "raw_references": [
+          "event-IRREL-01-01",
+          "event-IRREL-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.25,
+        "baseline_stddev": 0.0375,
+        "elevation_ratio": 3.83
+      }
+    }
+  },
+  {
+    "scenario_id": "IRREL-02",
+    "category_code": "H",
+    "scenario_class": "irrelevant_top_knowledge",
+    "incident": {
+      "incident_id": "INC-V2-IRREL-02",
+      "created_at": "2026-10-03T12:58:47.140584Z",
+      "updated_at": "2026-10-03T12:58:47.140584Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "user-profile-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-irrel-02",
+      "trigger_rule_name": "Disk IO Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "c26b3c61-68f2-4c25-8126-983601080b0f",
+          "kind": "metric",
+          "description": "Observed disk.io.utilization = 0.966",
+          "value": 0.966,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "disk.io.utilization",
+            "threshold": 0.85
+          }
+        }
+      ],
+      "title": "Disk IO Saturation on user-profile-service",
+      "description": "Automated alert: disk.io.utilization observed at 0.966, exceeding threshold 0.850",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-irrel-02::user-profile-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-IRREL-02",
+      "scenario_class": "irrelevant_top_knowledge",
+      "expected_root_cause": "unbounded debug log rotation writing to root volume",
+      "acceptable_root_causes": [
+        "unbounded log file growth",
+        "debug logging disk fill",
+        "log volume saturation"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "database tablespace exhaustion"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-disk-009"
+      ],
+      "distractor_documents": [
+        "arch-003",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "database storage failure on stateless service"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.966,
+        "observed_max": 1.1592,
+        "observed_min": 0.7728,
+        "latest_value": 0.966,
+        "raw_references": [
+          "event-IRREL-02-01",
+          "event-IRREL-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.25,
+        "baseline_stddev": 0.0375,
+        "elevation_ratio": 3.86
+      }
+    }
+  },
+  {
+    "scenario_id": "IRREL-03",
+    "category_code": "H",
+    "scenario_class": "irrelevant_top_knowledge",
+    "incident": {
+      "incident_id": "INC-V2-IRREL-03",
+      "created_at": "2026-10-03T12:58:47.140598Z",
+      "updated_at": "2026-10-03T12:58:47.140598Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "user-profile-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-irrel-03",
+      "trigger_rule_name": "Disk IO Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "c1de7fdc-6dda-4c83-b57f-b7c982c390e6",
+          "kind": "metric",
+          "description": "Observed disk.io.utilization = 0.974",
+          "value": 0.974,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "disk.io.utilization",
+            "threshold": 0.85
+          }
+        }
+      ],
+      "title": "Disk IO Saturation on user-profile-service",
+      "description": "Automated alert: disk.io.utilization observed at 0.974, exceeding threshold 0.850",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-irrel-03::user-profile-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-IRREL-03",
+      "scenario_class": "irrelevant_top_knowledge",
+      "expected_root_cause": "unbounded debug log rotation writing to root volume",
+      "acceptable_root_causes": [
+        "unbounded log file growth",
+        "debug logging disk fill",
+        "log volume saturation"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "database tablespace exhaustion"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-disk-009"
+      ],
+      "distractor_documents": [
+        "arch-003",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "database storage failure on stateless service"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.974,
+        "observed_max": 1.1687999999999998,
+        "observed_min": 0.7792,
+        "latest_value": 0.974,
+        "raw_references": [
+          "event-IRREL-03-01",
+          "event-IRREL-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.25,
+        "baseline_stddev": 0.0375,
+        "elevation_ratio": 3.9
+      }
+    }
+  },
+  {
+    "scenario_id": "IRREL-04",
+    "category_code": "H",
+    "scenario_class": "irrelevant_top_knowledge",
+    "incident": {
+      "incident_id": "INC-V2-IRREL-04",
+      "created_at": "2026-10-03T12:58:47.140609Z",
+      "updated_at": "2026-10-03T12:58:47.140609Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "user-profile-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-irrel-04",
+      "trigger_rule_name": "Disk IO Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "74f085c0-3c62-409d-9e44-d8b32ba75070",
+          "kind": "metric",
+          "description": "Observed disk.io.utilization = 0.982",
+          "value": 0.982,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "disk.io.utilization",
+            "threshold": 0.85
+          }
+        }
+      ],
+      "title": "Disk IO Saturation on user-profile-service",
+      "description": "Automated alert: disk.io.utilization observed at 0.982, exceeding threshold 0.850",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-irrel-04::user-profile-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-IRREL-04",
+      "scenario_class": "irrelevant_top_knowledge",
+      "expected_root_cause": "unbounded debug log rotation writing to root volume",
+      "acceptable_root_causes": [
+        "unbounded log file growth",
+        "debug logging disk fill",
+        "log volume saturation"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "database tablespace exhaustion"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-disk-009"
+      ],
+      "distractor_documents": [
+        "arch-003",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "database storage failure on stateless service"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.982,
+        "observed_max": 1.1784,
+        "observed_min": 0.7856000000000001,
+        "latest_value": 0.982,
+        "raw_references": [
+          "event-IRREL-04-01",
+          "event-IRREL-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.25,
+        "baseline_stddev": 0.0375,
+        "elevation_ratio": 3.93
+      }
+    }
+  },
+  {
+    "scenario_id": "IRREL-05",
+    "category_code": "H",
+    "scenario_class": "irrelevant_top_knowledge",
+    "incident": {
+      "incident_id": "INC-V2-IRREL-05",
+      "created_at": "2026-10-03T12:58:47.140619Z",
+      "updated_at": "2026-10-03T12:58:47.140619Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "user-profile-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-irrel-05",
+      "trigger_rule_name": "Disk IO Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "61ff1713-3031-4045-a51c-89b50107c5a1",
+          "kind": "metric",
+          "description": "Observed disk.io.utilization = 0.990",
+          "value": 0.99,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "disk.io.utilization",
+            "threshold": 0.85
+          }
+        }
+      ],
+      "title": "Disk IO Saturation on user-profile-service",
+      "description": "Automated alert: disk.io.utilization observed at 0.990, exceeding threshold 0.850",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-irrel-05::user-profile-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-IRREL-05",
+      "scenario_class": "irrelevant_top_knowledge",
+      "expected_root_cause": "unbounded debug log rotation writing to root volume",
+      "acceptable_root_causes": [
+        "unbounded log file growth",
+        "debug logging disk fill",
+        "log volume saturation"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "database tablespace exhaustion"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-disk-009"
+      ],
+      "distractor_documents": [
+        "arch-003",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "database storage failure on stateless service"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.99,
+        "observed_max": 1.188,
+        "observed_min": 0.792,
+        "latest_value": 0.99,
+        "raw_references": [
+          "event-IRREL-05-01",
+          "event-IRREL-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.25,
+        "baseline_stddev": 0.0375,
+        "elevation_ratio": 3.96
+      }
+    }
+  },
+  {
+    "scenario_id": "IRREL-06",
+    "category_code": "H",
+    "scenario_class": "irrelevant_top_knowledge",
+    "incident": {
+      "incident_id": "INC-V2-IRREL-06",
+      "created_at": "2026-10-03T12:58:47.140630Z",
+      "updated_at": "2026-10-03T12:58:47.140630Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "user-profile-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-irrel-06",
+      "trigger_rule_name": "Disk IO Saturation",
+      "initial_evidence": [
+        {
+          "evidence_id": "c87276d1-ca69-47de-bb7d-382e0e09f1d4",
+          "kind": "metric",
+          "description": "Observed disk.io.utilization = 0.998",
+          "value": 0.998,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "disk.io.utilization",
+            "threshold": 0.85
+          }
+        }
+      ],
+      "title": "Disk IO Saturation on user-profile-service",
+      "description": "Automated alert: disk.io.utilization observed at 0.998, exceeding threshold 0.850",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-irrel-06::user-profile-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-IRREL-06",
+      "scenario_class": "irrelevant_top_knowledge",
+      "expected_root_cause": "unbounded debug log rotation writing to root volume",
+      "acceptable_root_causes": [
+        "unbounded log file growth",
+        "debug logging disk fill",
+        "log volume saturation"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "database tablespace exhaustion"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-disk-009"
+      ],
+      "distractor_documents": [
+        "arch-003",
+        "rb-db-001"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "database storage failure on stateless service"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 12,
+        "observed_avg": 0.998,
+        "observed_max": 1.1976,
+        "observed_min": 0.7984,
+        "latest_value": 0.998,
+        "raw_references": [
+          "event-IRREL-06-01",
+          "event-IRREL-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "user-profile-service",
+        "metric": "disk.io.utilization",
+        "sample_count": 30,
+        "baseline_avg": 0.25,
+        "baseline_stddev": 0.0375,
+        "elevation_ratio": 3.99
+      }
+    }
+  },
+  {
+    "scenario_id": "PM-01",
+    "category_code": "I",
+    "scenario_class": "stale_postmortem",
+    "incident": {
+      "incident_id": "INC-V2-PM-01",
+      "created_at": "2026-10-03T12:58:47.140641Z",
+      "updated_at": "2026-10-03T12:58:47.140641Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-pm-01",
+      "trigger_rule_name": "Token Verification Failure Cascade",
+      "initial_evidence": [
+        {
+          "evidence_id": "cbf0f456-5a17-49f2-908a-f7cb4ea75089",
+          "kind": "metric",
+          "description": "Observed auth.token.verification_failure_rate = 0.440",
+          "value": 0.44,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "auth.token.verification_failure_rate",
+            "threshold": 0.15
+          }
+        }
+      ],
+      "title": "Token Verification Failure Cascade on auth-service",
+      "description": "Automated alert: auth.token.verification_failure_rate observed at 0.440, exceeding threshold 0.150",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-pm-01::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-PM-01",
+      "scenario_class": "stale_postmortem",
+      "expected_root_cause": "jwks public key rotation clock skew",
+      "acceptable_root_causes": [
+        "jwks key rotation skew",
+        "public key caching skew",
+        "jwt signature clock drift"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "token expiry cascade from 2024 architecture"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-auth-007"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "repeat pm-2026-05 root cause blindly"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 12,
+        "observed_avg": 0.44,
+        "observed_max": 0.528,
+        "observed_min": 0.35200000000000004,
+        "latest_value": 0.44,
+        "raw_references": [
+          "event-PM-01-01",
+          "event-PM-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 8.8
+      }
+    }
+  },
+  {
+    "scenario_id": "PM-02",
+    "category_code": "I",
+    "scenario_class": "stale_postmortem",
+    "incident": {
+      "incident_id": "INC-V2-PM-02",
+      "created_at": "2026-10-03T12:58:47.140652Z",
+      "updated_at": "2026-10-03T12:58:47.140652Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-pm-02",
+      "trigger_rule_name": "Token Verification Failure Cascade",
+      "initial_evidence": [
+        {
+          "evidence_id": "734f9553-e361-4c1d-919f-bcb140e70a65",
+          "kind": "metric",
+          "description": "Observed auth.token.verification_failure_rate = 0.480",
+          "value": 0.48000000000000004,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "auth.token.verification_failure_rate",
+            "threshold": 0.15
+          }
+        }
+      ],
+      "title": "Token Verification Failure Cascade on auth-service",
+      "description": "Automated alert: auth.token.verification_failure_rate observed at 0.480, exceeding threshold 0.150",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-pm-02::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-PM-02",
+      "scenario_class": "stale_postmortem",
+      "expected_root_cause": "jwks public key rotation clock skew",
+      "acceptable_root_causes": [
+        "jwks key rotation skew",
+        "public key caching skew",
+        "jwt signature clock drift"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "token expiry cascade from 2024 architecture"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-auth-007"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "repeat pm-2026-05 root cause blindly"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 12,
+        "observed_avg": 0.48000000000000004,
+        "observed_max": 0.5760000000000001,
+        "observed_min": 0.38400000000000006,
+        "latest_value": 0.48000000000000004,
+        "raw_references": [
+          "event-PM-02-01",
+          "event-PM-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 9.6
+      }
+    }
+  },
+  {
+    "scenario_id": "PM-03",
+    "category_code": "I",
+    "scenario_class": "stale_postmortem",
+    "incident": {
+      "incident_id": "INC-V2-PM-03",
+      "created_at": "2026-10-03T12:58:47.140662Z",
+      "updated_at": "2026-10-03T12:58:47.140662Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-pm-03",
+      "trigger_rule_name": "Token Verification Failure Cascade",
+      "initial_evidence": [
+        {
+          "evidence_id": "25454a4b-6cc7-48aa-9637-069f01bf933f",
+          "kind": "metric",
+          "description": "Observed auth.token.verification_failure_rate = 0.520",
+          "value": 0.52,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "auth.token.verification_failure_rate",
+            "threshold": 0.15
+          }
+        }
+      ],
+      "title": "Token Verification Failure Cascade on auth-service",
+      "description": "Automated alert: auth.token.verification_failure_rate observed at 0.520, exceeding threshold 0.150",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-pm-03::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-PM-03",
+      "scenario_class": "stale_postmortem",
+      "expected_root_cause": "jwks public key rotation clock skew",
+      "acceptable_root_causes": [
+        "jwks key rotation skew",
+        "public key caching skew",
+        "jwt signature clock drift"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "token expiry cascade from 2024 architecture"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-auth-007"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "repeat pm-2026-05 root cause blindly"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 12,
+        "observed_avg": 0.52,
+        "observed_max": 0.624,
+        "observed_min": 0.41600000000000004,
+        "latest_value": 0.52,
+        "raw_references": [
+          "event-PM-03-01",
+          "event-PM-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 10.4
+      }
+    }
+  },
+  {
+    "scenario_id": "PM-04",
+    "category_code": "I",
+    "scenario_class": "stale_postmortem",
+    "incident": {
+      "incident_id": "INC-V2-PM-04",
+      "created_at": "2026-10-03T12:58:47.140673Z",
+      "updated_at": "2026-10-03T12:58:47.140673Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-pm-04",
+      "trigger_rule_name": "Token Verification Failure Cascade",
+      "initial_evidence": [
+        {
+          "evidence_id": "471cb69c-54d1-4995-aec0-80a09155241b",
+          "kind": "metric",
+          "description": "Observed auth.token.verification_failure_rate = 0.560",
+          "value": 0.56,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "auth.token.verification_failure_rate",
+            "threshold": 0.15
+          }
+        }
+      ],
+      "title": "Token Verification Failure Cascade on auth-service",
+      "description": "Automated alert: auth.token.verification_failure_rate observed at 0.560, exceeding threshold 0.150",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-pm-04::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-PM-04",
+      "scenario_class": "stale_postmortem",
+      "expected_root_cause": "jwks public key rotation clock skew",
+      "acceptable_root_causes": [
+        "jwks key rotation skew",
+        "public key caching skew",
+        "jwt signature clock drift"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "token expiry cascade from 2024 architecture"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-auth-007"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "repeat pm-2026-05 root cause blindly"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 12,
+        "observed_avg": 0.56,
+        "observed_max": 0.672,
+        "observed_min": 0.44800000000000006,
+        "latest_value": 0.56,
+        "raw_references": [
+          "event-PM-04-01",
+          "event-PM-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 11.2
+      }
+    }
+  },
+  {
+    "scenario_id": "PM-05",
+    "category_code": "I",
+    "scenario_class": "stale_postmortem",
+    "incident": {
+      "incident_id": "INC-V2-PM-05",
+      "created_at": "2026-10-03T12:58:47.140684Z",
+      "updated_at": "2026-10-03T12:58:47.140684Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-pm-05",
+      "trigger_rule_name": "Token Verification Failure Cascade",
+      "initial_evidence": [
+        {
+          "evidence_id": "b83a4a77-cc2a-4d1a-92c0-b0deb631c486",
+          "kind": "metric",
+          "description": "Observed auth.token.verification_failure_rate = 0.600",
+          "value": 0.6000000000000001,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "auth.token.verification_failure_rate",
+            "threshold": 0.15
+          }
+        }
+      ],
+      "title": "Token Verification Failure Cascade on auth-service",
+      "description": "Automated alert: auth.token.verification_failure_rate observed at 0.600, exceeding threshold 0.150",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-pm-05::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-PM-05",
+      "scenario_class": "stale_postmortem",
+      "expected_root_cause": "jwks public key rotation clock skew",
+      "acceptable_root_causes": [
+        "jwks key rotation skew",
+        "public key caching skew",
+        "jwt signature clock drift"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "token expiry cascade from 2024 architecture"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-auth-007"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "repeat pm-2026-05 root cause blindly"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 12,
+        "observed_avg": 0.6000000000000001,
+        "observed_max": 0.7200000000000001,
+        "observed_min": 0.4800000000000001,
+        "latest_value": 0.6000000000000001,
+        "raw_references": [
+          "event-PM-05-01",
+          "event-PM-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 12.0
+      }
+    }
+  },
+  {
+    "scenario_id": "PM-06",
+    "category_code": "I",
+    "scenario_class": "stale_postmortem",
+    "incident": {
+      "incident_id": "INC-V2-PM-06",
+      "created_at": "2026-10-03T12:58:47.140697Z",
+      "updated_at": "2026-10-03T12:58:47.140697Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "auth-service",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-pm-06",
+      "trigger_rule_name": "Token Verification Failure Cascade",
+      "initial_evidence": [
+        {
+          "evidence_id": "799cbdc1-a133-41f8-8064-80a0493d7931",
+          "kind": "metric",
+          "description": "Observed auth.token.verification_failure_rate = 0.640",
+          "value": 0.64,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "auth.token.verification_failure_rate",
+            "threshold": 0.15
+          }
+        }
+      ],
+      "title": "Token Verification Failure Cascade on auth-service",
+      "description": "Automated alert: auth.token.verification_failure_rate observed at 0.640, exceeding threshold 0.150",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-pm-06::auth-service::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-PM-06",
+      "scenario_class": "stale_postmortem",
+      "expected_root_cause": "jwks public key rotation clock skew",
+      "acceptable_root_causes": [
+        "jwks key rotation skew",
+        "public key caching skew",
+        "jwt signature clock drift"
+      ],
+      "required_evidence": [
+        "metric",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "token expiry cascade from 2024 architecture"
+      ],
+      "expected_uncertainty": "medium",
+      "knowledge_documents_that_should_help": [
+        "rb-auth-007"
+      ],
+      "distractor_documents": [
+        "pm-2026-05"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "repeat pm-2026-05 root cause blindly"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 12,
+        "observed_avg": 0.64,
+        "observed_max": 0.768,
+        "observed_min": 0.512,
+        "latest_value": 0.64,
+        "raw_references": [
+          "event-PM-06-01",
+          "event-PM-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "auth-service",
+        "metric": "auth.token.verification_failure_rate",
+        "sample_count": 30,
+        "baseline_avg": 0.05,
+        "baseline_stddev": 0.0075,
+        "elevation_ratio": 12.8
+      }
+    }
+  },
+  {
+    "scenario_id": "CHAIN-01",
+    "category_code": "J",
+    "scenario_class": "multi_source_causal_chain",
+    "incident": {
+      "incident_id": "INC-V2-CHAIN-01",
+      "created_at": "2026-10-03T12:58:47.140708Z",
+      "updated_at": "2026-10-03T12:58:47.140708Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-processor",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-chain-01",
+      "trigger_rule_name": "Kafka Consumer Lag Escalation",
+      "initial_evidence": [
+        {
+          "evidence_id": "3269218c-0189-43f0-876b-d66539507af7",
+          "kind": "metric",
+          "description": "Observed kafka.consumer.lag_records = 13500.000",
+          "value": 13500.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "kafka.consumer.lag_records",
+            "threshold": 2000.0
+          }
+        }
+      ],
+      "title": "Kafka Consumer Lag Escalation on order-processor",
+      "description": "Automated alert: kafka.consumer.lag_records observed at 13500.000, exceeding threshold 2000.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-chain-01::order-processor::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CHAIN-01",
+      "scenario_class": "multi_source_causal_chain",
+      "expected_root_cause": "memory leak causing frequent gc pauses stalling kafka consumer commits",
+      "acceptable_root_causes": [
+        "memory leak stalling consumer",
+        "gc pause causing consumer rebalance",
+        "consumer heartbeat timeout due to memory leak"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka broker failure",
+        "network partition"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-svc-002",
+        "rb-queue-004",
+        "rel-004"
+      ],
+      "distractor_documents": [
+        "pm-2026-06"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "broker-side outage"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 12,
+        "observed_avg": 13500.0,
+        "observed_max": 16200.0,
+        "observed_min": 10800.0,
+        "latest_value": 13500.0,
+        "raw_references": [
+          "event-CHAIN-01-01",
+          "event-CHAIN-01-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 270.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CHAIN-02",
+    "category_code": "J",
+    "scenario_class": "multi_source_causal_chain",
+    "incident": {
+      "incident_id": "INC-V2-CHAIN-02",
+      "created_at": "2026-10-03T12:58:47.140720Z",
+      "updated_at": "2026-10-03T12:58:47.140720Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-processor",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-chain-02",
+      "trigger_rule_name": "Kafka Consumer Lag Escalation",
+      "initial_evidence": [
+        {
+          "evidence_id": "f92b318b-739f-4555-98af-c50520c7a1bf",
+          "kind": "metric",
+          "description": "Observed kafka.consumer.lag_records = 15000.000",
+          "value": 15000.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "kafka.consumer.lag_records",
+            "threshold": 2000.0
+          }
+        }
+      ],
+      "title": "Kafka Consumer Lag Escalation on order-processor",
+      "description": "Automated alert: kafka.consumer.lag_records observed at 15000.000, exceeding threshold 2000.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-chain-02::order-processor::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CHAIN-02",
+      "scenario_class": "multi_source_causal_chain",
+      "expected_root_cause": "memory leak causing frequent gc pauses stalling kafka consumer commits",
+      "acceptable_root_causes": [
+        "memory leak stalling consumer",
+        "gc pause causing consumer rebalance",
+        "consumer heartbeat timeout due to memory leak"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka broker failure",
+        "network partition"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-svc-002",
+        "rb-queue-004",
+        "rel-004"
+      ],
+      "distractor_documents": [
+        "pm-2026-06"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "broker-side outage"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 12,
+        "observed_avg": 15000.0,
+        "observed_max": 18000.0,
+        "observed_min": 12000.0,
+        "latest_value": 15000.0,
+        "raw_references": [
+          "event-CHAIN-02-01",
+          "event-CHAIN-02-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 300.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CHAIN-03",
+    "category_code": "J",
+    "scenario_class": "multi_source_causal_chain",
+    "incident": {
+      "incident_id": "INC-V2-CHAIN-03",
+      "created_at": "2026-10-03T12:58:47.140732Z",
+      "updated_at": "2026-10-03T12:58:47.140732Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-processor",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-chain-03",
+      "trigger_rule_name": "Kafka Consumer Lag Escalation",
+      "initial_evidence": [
+        {
+          "evidence_id": "8b015e38-132d-4a47-99b7-3649830a5e97",
+          "kind": "metric",
+          "description": "Observed kafka.consumer.lag_records = 16500.000",
+          "value": 16500.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "kafka.consumer.lag_records",
+            "threshold": 2000.0
+          }
+        }
+      ],
+      "title": "Kafka Consumer Lag Escalation on order-processor",
+      "description": "Automated alert: kafka.consumer.lag_records observed at 16500.000, exceeding threshold 2000.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-chain-03::order-processor::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CHAIN-03",
+      "scenario_class": "multi_source_causal_chain",
+      "expected_root_cause": "memory leak causing frequent gc pauses stalling kafka consumer commits",
+      "acceptable_root_causes": [
+        "memory leak stalling consumer",
+        "gc pause causing consumer rebalance",
+        "consumer heartbeat timeout due to memory leak"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka broker failure",
+        "network partition"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-svc-002",
+        "rb-queue-004",
+        "rel-004"
+      ],
+      "distractor_documents": [
+        "pm-2026-06"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "broker-side outage"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 12,
+        "observed_avg": 16500.0,
+        "observed_max": 19800.0,
+        "observed_min": 13200.0,
+        "latest_value": 16500.0,
+        "raw_references": [
+          "event-CHAIN-03-01",
+          "event-CHAIN-03-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 330.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CHAIN-04",
+    "category_code": "J",
+    "scenario_class": "multi_source_causal_chain",
+    "incident": {
+      "incident_id": "INC-V2-CHAIN-04",
+      "created_at": "2026-10-03T12:58:47.140743Z",
+      "updated_at": "2026-10-03T12:58:47.140743Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-processor",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-chain-04",
+      "trigger_rule_name": "Kafka Consumer Lag Escalation",
+      "initial_evidence": [
+        {
+          "evidence_id": "8ccdf341-d289-4740-8e71-cdb6bff031de",
+          "kind": "metric",
+          "description": "Observed kafka.consumer.lag_records = 18000.000",
+          "value": 18000.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "kafka.consumer.lag_records",
+            "threshold": 2000.0
+          }
+        }
+      ],
+      "title": "Kafka Consumer Lag Escalation on order-processor",
+      "description": "Automated alert: kafka.consumer.lag_records observed at 18000.000, exceeding threshold 2000.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-chain-04::order-processor::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CHAIN-04",
+      "scenario_class": "multi_source_causal_chain",
+      "expected_root_cause": "memory leak causing frequent gc pauses stalling kafka consumer commits",
+      "acceptable_root_causes": [
+        "memory leak stalling consumer",
+        "gc pause causing consumer rebalance",
+        "consumer heartbeat timeout due to memory leak"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka broker failure",
+        "network partition"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-svc-002",
+        "rb-queue-004",
+        "rel-004"
+      ],
+      "distractor_documents": [
+        "pm-2026-06"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "broker-side outage"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 12,
+        "observed_avg": 18000.0,
+        "observed_max": 21600.0,
+        "observed_min": 14400.0,
+        "latest_value": 18000.0,
+        "raw_references": [
+          "event-CHAIN-04-01",
+          "event-CHAIN-04-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 360.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CHAIN-05",
+    "category_code": "J",
+    "scenario_class": "multi_source_causal_chain",
+    "incident": {
+      "incident_id": "INC-V2-CHAIN-05",
+      "created_at": "2026-10-03T12:58:47.140754Z",
+      "updated_at": "2026-10-03T12:58:47.140754Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-processor",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-chain-05",
+      "trigger_rule_name": "Kafka Consumer Lag Escalation",
+      "initial_evidence": [
+        {
+          "evidence_id": "062b1cb7-c8dd-45a3-83c6-3afdb1bb74d8",
+          "kind": "metric",
+          "description": "Observed kafka.consumer.lag_records = 19500.000",
+          "value": 19500.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "kafka.consumer.lag_records",
+            "threshold": 2000.0
+          }
+        }
+      ],
+      "title": "Kafka Consumer Lag Escalation on order-processor",
+      "description": "Automated alert: kafka.consumer.lag_records observed at 19500.000, exceeding threshold 2000.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-chain-05::order-processor::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CHAIN-05",
+      "scenario_class": "multi_source_causal_chain",
+      "expected_root_cause": "memory leak causing frequent gc pauses stalling kafka consumer commits",
+      "acceptable_root_causes": [
+        "memory leak stalling consumer",
+        "gc pause causing consumer rebalance",
+        "consumer heartbeat timeout due to memory leak"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka broker failure",
+        "network partition"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-svc-002",
+        "rb-queue-004",
+        "rel-004"
+      ],
+      "distractor_documents": [
+        "pm-2026-06"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "broker-side outage"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 12,
+        "observed_avg": 19500.0,
+        "observed_max": 23400.0,
+        "observed_min": 15600.0,
+        "latest_value": 19500.0,
+        "raw_references": [
+          "event-CHAIN-05-01",
+          "event-CHAIN-05-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 390.0
+      }
+    }
+  },
+  {
+    "scenario_id": "CHAIN-06",
+    "category_code": "J",
+    "scenario_class": "multi_source_causal_chain",
+    "incident": {
+      "incident_id": "INC-V2-CHAIN-06",
+      "created_at": "2026-10-03T12:58:47.140765Z",
+      "updated_at": "2026-10-03T12:58:47.140765Z",
+      "severity": "high",
+      "status": "open",
+      "service_name": "order-processor",
+      "service_namespace": "core",
+      "environment": "production",
+      "trigger_type": "metric_threshold",
+      "trigger_rule_id": "rule-chain-06",
+      "trigger_rule_name": "Kafka Consumer Lag Escalation",
+      "initial_evidence": [
+        {
+          "evidence_id": "48c1ded1-4c76-49eb-ab9f-822b66e2b99c",
+          "kind": "metric",
+          "description": "Observed kafka.consumer.lag_records = 21000.000",
+          "value": 21000.0,
+          "telemetry_event_id": null,
+          "timestamp": null,
+          "attributes": {
+            "metric_name": "kafka.consumer.lag_records",
+            "threshold": 2000.0
+          }
+        }
+      ],
+      "title": "Kafka Consumer Lag Escalation on order-processor",
+      "description": "Automated alert: kafka.consumer.lag_records observed at 21000.000, exceeding threshold 2000.000",
+      "source_provider": "otel",
+      "source_integration_id": "otel-collector-prod",
+      "episode_key": "rule-chain-06::order-processor::production",
+      "context": {}
+    },
+    "ground_truth": {
+      "incident_id": "INC-V2-CHAIN-06",
+      "scenario_class": "multi_source_causal_chain",
+      "expected_root_cause": "memory leak causing frequent gc pauses stalling kafka consumer commits",
+      "acceptable_root_causes": [
+        "memory leak stalling consumer",
+        "gc pause causing consumer rebalance",
+        "consumer heartbeat timeout due to memory leak"
+      ],
+      "required_evidence": [
+        "metric",
+        "release",
+        "runbook"
+      ],
+      "contradicting_evidence": [
+        "kafka broker failure",
+        "network partition"
+      ],
+      "expected_uncertainty": "low",
+      "knowledge_documents_that_should_help": [
+        "rb-svc-002",
+        "rb-queue-004",
+        "rel-004"
+      ],
+      "distractor_documents": [
+        "pm-2026-06"
+      ],
+      "forbidden_ground_truth_leakage": [
+        "broker-side outage"
+      ]
+    },
+    "simulated_telemetry": {
+      "recent": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 12,
+        "observed_avg": 21000.0,
+        "observed_max": 25200.0,
+        "observed_min": 16800.0,
+        "latest_value": 21000.0,
+        "raw_references": [
+          "event-CHAIN-06-01",
+          "event-CHAIN-06-02"
+        ]
+      },
+      "baseline": {
+        "resource": "order-processor",
+        "metric": "kafka.consumer.lag_records",
+        "sample_count": 30,
+        "baseline_avg": 50.0,
+        "baseline_stddev": 7.5,
+        "elevation_ratio": 420.0
+      }
+    }
+  }
+]
