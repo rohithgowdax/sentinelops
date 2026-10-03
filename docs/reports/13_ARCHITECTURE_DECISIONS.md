@@ -269,7 +269,29 @@ Implement `CrossFeatureReranker` operating over top candidates from RRF. The rer
 4. Document diversification to prevent single-runbook context saturation.
 
 ### Consequences
-- Measured Recall@5 improved from 0.7400 to 0.7800, and nDCG@10 improved from 1.6118 to 1.6842 in benchmark evaluations.
+- Measured Recall@5 improved from 0.7400 to 0.7900 in benchmark evaluations (audited nDCG@10 is 0.8057 with strict standard formula; see ADR-018).
+
+---
+
+## ADR-018 — Evaluator Hardening, Bounded Metrics Calculation, and Offline Emulator Classification
+
+### Context
+An evaluation audit of Slice 3 revealed three critical concerns:
+1. `nDCG@10` was reporting values > 1.0 (1.6118 – 1.6842) due to chunk-level relevance accumulation dividing by an unnormalized theoretical ideal document scale.
+2. `dense_only`, `sparse_only`, and `hybrid` retrieval modes reported identical metrics (0.7400 Recall@5) because `QdrantKnowledgeProvider` never fitted BM25 frequencies when instantiated fresh, returning zero sparse scores and yielding identical dense rankings.
+3. Reported "real-model" latency was 17–22 ms, which reflected the local CPU inference of an offline semantic emulator when no API key was configured, rather than an external LLM API.
+
+### Decision
+1. **Mathematical nDCG Boundedness:** Refactor `compute_ndcg_at_k` to evaluate relevance at the document level: deduplicate multiple chunks belonging to the same document (preserving their earliest retrieved rank), ensuring $0.0 \le \text{DCG@k} \le \text{IDCG@k}$ and strictly bounding $\text{nDCG@k} \in [0.0, 1.0]$.
+2. **Dynamic BM25 Corpus Fitting:** Add `_ensure_bm25_fit()` in `QdrantKnowledgeProvider` to dynamically fit the BM25 index on all indexed chunks upon first sparse/hybrid search, and implement distinct candidate retrieval paths for dense and sparse search.
+3. **Honest Provider Classification:** Formally classify `RealLLMProvider` as an `offline_semantic_emulator` when unkeyed. Accurately report local CPU execution latency while recording external token counts, token latency, and costs as `NOT AVAILABLE` instead of fabricating values.
+4. **Wilson Score Confidence Intervals:** Compute and report 95% Wilson score confidence intervals for all sample proportions in investigation benchmarks.
+5. **Evaluator Regression Tests:** Add dedicated test suite (`tests/unit/test_evaluator_audit.py`) validating nDCG mathematical bounds, ranking divergence, hybrid fusion, reranking adjustments, offline emulator accounting, and benchmark isolation.
+
+### Consequences
+- All evaluation metrics are mathematically sound, standard, and defensible.
+- CI and benchmark runs produce verifiable, non-identical metrics across retrieval modes.
+- External API claims are never fabricated; zero unmeasured metrics are reported as measured.
 
 ---
 

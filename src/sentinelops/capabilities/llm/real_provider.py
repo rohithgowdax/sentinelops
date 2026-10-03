@@ -49,8 +49,44 @@ class RealLLMProvider(LLMProvider):
         self.api_key = api_key
         self.base_url = (base_url or "https://api.openai.com/v1").rstrip("/")
         self.timeout = timeout_seconds
-        self.total_tokens_used = 0
-        self.total_latency_seconds = 0.0
+
+        # Distinct tracking for external API vs local offline emulator
+        self.is_external_configured = bool(api_key and not api_key.startswith("mock-") and len(api_key) > 10)
+        self.call_count = 0
+        self.external_api_calls = 0
+        self.input_tokens: int | None = None
+        self.output_tokens: int | None = None
+        self.total_tokens: int | None = None
+        self.estimated_cost_usd: float | None = None
+        self.local_emulator_latency_seconds = 0.0
+        self.external_network_latency_seconds = 0.0
+
+    def get_usage_accounting(self) -> dict[str, Any]:
+        """Return structured token usage, cost accounting, and latency breakdown."""
+        if not self.is_external_configured:
+            return {
+                "provider_mode": "offline_semantic_emulator",
+                "model": self.model,
+                "external_api_calls": 0,
+                "input_tokens": "NOT AVAILABLE",
+                "output_tokens": "NOT AVAILABLE",
+                "total_tokens": "NOT AVAILABLE",
+                "estimated_cost_usd": "NOT AVAILABLE",
+                "cost_per_investigation_usd": "NOT AVAILABLE",
+                "external_network_latency_ms": "NOT AVAILABLE",
+                "local_emulator_latency_ms": round(self.local_emulator_latency_seconds * 1000.0, 2),
+            }
+        return {
+            "provider_mode": "external_api",
+            "model": self.model,
+            "external_api_calls": self.external_api_calls,
+            "input_tokens": self.input_tokens or 0,
+            "output_tokens": self.output_tokens or 0,
+            "total_tokens": self.total_tokens or 0,
+            "estimated_cost_usd": round(self.estimated_cost_usd or 0.0, 6),
+            "external_network_latency_ms": round(self.external_network_latency_seconds * 1000.0, 2),
+            "local_emulator_latency_ms": round(self.local_emulator_latency_seconds * 1000.0, 2),
+        }
 
     async def _call_external_llm(
         self,
@@ -128,8 +164,7 @@ class RealLLMProvider(LLMProvider):
                 f"Correlating real-time operational telemetry with organizational runbooks and historical postmortems."
             ),
         )
-        self.total_latency_seconds += time.perf_counter() - start
-        self.total_tokens_used += 180
+        self.local_emulator_latency_seconds += time.perf_counter() - start
         return plan
 
     async def generate_knowledge_queries(
@@ -152,8 +187,7 @@ class RealLLMProvider(LLMProvider):
                 limit=3,
             ),
         ]
-        self.total_latency_seconds += time.perf_counter() - start
-        self.total_tokens_used += 120
+        self.local_emulator_latency_seconds += time.perf_counter() - start
         return queries
 
     async def analyze_hypotheses(
@@ -243,8 +277,7 @@ class RealLLMProvider(LLMProvider):
                 )
             )
 
-        self.total_latency_seconds += time.perf_counter() - start
-        self.total_tokens_used += 260
+        self.local_emulator_latency_seconds += time.perf_counter() - start
         return hypotheses
 
     async def generate_diagnosis(
@@ -297,8 +330,7 @@ class RealLLMProvider(LLMProvider):
             uncertainties=[] if knowledge_ids else ["Telemetry alone without operational runbook baseline context"],
         )
 
-        self.total_latency_seconds += time.perf_counter() - start
-        self.total_tokens_used += 340
+        self.local_emulator_latency_seconds += time.perf_counter() - start
         return diagnosis
 
     async def verify_diagnosis(
@@ -340,8 +372,7 @@ class RealLLMProvider(LLMProvider):
                 missing_evidence=["additional_telemetry_or_knowledge"],
             )
 
-        self.total_latency_seconds += time.perf_counter() - start
-        self.total_tokens_used += 120
+        self.local_emulator_latency_seconds += time.perf_counter() - start
         return VerificationResult(
             is_verified=True,
             confidence=diagnosis.confidence,

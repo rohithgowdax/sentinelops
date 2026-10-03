@@ -1,0 +1,12 @@
+{
+  "benchmark_name": "sentinelops-knowledge-retrieval",
+  "benchmark_version": "slice3-v2-hardened",
+  "timestamp": "2026-10-03T12:37:02Z",
+  "collection_name": "sentinelops_knowledge",
+  "query_count": 50,
+  "embedding_provider": "DeterministicEmbeddingProvider-128d",
+  "sparse_provider": "BM25Encoder-k1.5-b0.75",
+  "fusion_algorithm": "ReciprocalRankFusion-k60",
+  "reranker": "CrossFeatureReranker",
+  "ndcg_formula": "standard_deduplicated_document_ndcg_bounded_0_to_1"
+}

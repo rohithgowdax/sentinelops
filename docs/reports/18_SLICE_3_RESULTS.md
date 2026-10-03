@@ -78,25 +78,27 @@ TelemetryEvidenceProvider                           KnowledgeProvider
 
 ### 1. Retrieval Benchmark (50 Labeled Operational Queries)
 
+### 1. Retrieval Benchmark (50 Labeled Operational Queries — Hardened)
+
 Evaluated across 50 labeled queries against 33 operational markdown documents (118 chunks) in `knowledge/`:
 
-| Retrieval Mode | Recall@5 | MRR | nDCG@10 | Mean Latency | Status |
-|---|---|---|---|---|---|
-| `dense_only` | 0.7400 | 0.8392 | 1.6118 | 3.5 ms | Verified |
-| `sparse_only` | 0.7400 | 0.8392 | 1.6118 | 2.6 ms | Verified |
-| `hybrid` (RRF k=60) | 0.7400 | 0.8392 | 1.6118 | 5.1 ms | Verified |
-| **`hybrid_plus_rerank`** | **0.7800** | **0.8290** | **1.6842** | **4.0 ms** | **Best Performance** |
+| Retrieval Mode | Recall@5 | Recall@10 | MRR | Standard nDCG@10 | Latency (Mean / p50 / p95) | Status |
+|---|---|---|---|---|---|---|
+| `dense_only` | 0.7400 | 0.8133 | 0.8392 | **0.7862** | 2.5 / 2.2 / 3.5 ms | Verified |
+| `sparse_only` | 0.7800 | 0.8300 | 0.8667 | **0.8279** | 5.2 / 5.1 / 6.4 ms | Verified |
+| `hybrid` (RRF k=60) | 0.7633 | 0.8400 | 0.8567 | **0.8220** | 8.2 / 7.9 / 11.3 ms | Verified |
+| **`hybrid_plus_rerank`** | **0.7900** | **0.8400** | **0.8300** | **0.8057** | 8.4 / 8.4 / 10.4 ms | **Highest Recall** |
 
-*Measured by `src/sentinelops/evals/run_retrieval_eval.py` and saved to `docs/reports/retrieval_benchmark_results.json`.*
+*Measured by `src/sentinelops/evals/run_retrieval_eval.py` and saved to `evals/results/retrieval/`.*
 
 #### Retrieval Analysis
-- **Dense semantic retrieval** captures vocabulary synonyms (e.g. mapping "connection pool starvation" to database saturation runbooks).
-- **Sparse BM25 retrieval** captures precise technical tokens (e.g. `ERR_PG_POOL_EXHAUSTED`, HTTP status `504`, service name `payments-service`).
-- **Hybrid + Cross-Feature Reranking** achieves the highest Recall@5 (**0.7800**) and nDCG@10 (**1.6842**) by boosting exact service matches (+0.25) and resolution/remediation sections (+0.15).
+- **Standard nDCG Verification:** Previous score of 1.6118 was mathematically corrected by deduplicating document hits to prevent duplicate chunks of the same document from inflating DCG above IDCG. nDCG@10 is now strictly bounded in \([0.0, 1.0]\).
+- **Dense vs Sparse Distinct Channels:** Dynamically pre-fitting BM25 over the collection ensures sparse retrieval scores the entire corpus. Top-5 candidate overlap between dense and sparse is **52.00%**, proving the two retrieval channels capture distinct semantic vs lexical signals.
+- **Hybrid Fusion & Reranking:** Hybrid retrieval achieves Recall@10 of **0.8400**, and adding cross-feature reranking achieves the highest Recall@5 (**0.7900**).
 
 ---
 
-### 2. Investigation Ablation Benchmark (30 Held-Out Incidents)
+### 2. Investigation Ablation Benchmark (30 Held-Out Incidents — Hardened)
 
 Evaluated across 30 held-out incident scenarios spanning 5 operational failure domains:
 1. Database Connection Pool Exhaustion
@@ -105,26 +107,27 @@ Evaluated across 30 held-out incident scenarios spanning 5 operational failure d
 4. External API Rate Limiting / 429 Cascades
 5. Disk & Resource Capacity Exhaustion
 
-| Mode | Telemetry Evidence | Knowledge Grounding | LLM Engine | Diagnosis Accuracy | Citation Verification | Evidence Grounding | Avg Latency |
-|---|---|---|---|---|---|---|---|
-| **Mode A** | Yes | No | Deterministic | **6.67%** (2/30) | 100.0% | 100.0% | 0.016s |
-| **Mode B** | Yes | **Yes** | Deterministic | **70.00%** (21/30) | 100.0% | 100.0% | 0.021s |
-| **Mode C** | Yes | No | Real (Schema) | **6.67%** (2/30) | 100.0% | 100.0% | 0.017s |
-| **Mode D** | Yes | **Yes** | Real (Schema) | **33.33%** (10/30) | 100.0% | 100.0% | 0.022s |
+| Mode | Provider Mode | Knowledge | Accuracy (Wilson 95% CI) | Verified | Citation Valid | Latency (p50 / p95) |
+|---|---|---|---|---|---|---|
+| **Mode A** | Deterministic Engine | None | 6.7% (2/30) [1.8%, 21.3%] | 100.0% | 100.0% | 0.005s / 0.018s |
+| **Mode B** | Deterministic Engine | **Qdrant** | **73.3%** (22/30) [55.5%, 85.8%] | 100.0% | 100.0% | 0.020s / 0.026s |
+| **Mode C** | Offline Semantic Emulator | None | 6.7% (2/30) [1.8%, 21.3%] | 100.0% | 100.0% | 0.005s / 0.009s |
+| **Mode D** | Offline Semantic Emulator | **Qdrant** | **40.0%** (12/30) [24.6%, 57.7%] | 100.0% | 100.0% | 0.019s / 0.027s |
 
-*Measured by `src/sentinelops/evals/run_llm_eval.py` and saved to `docs/reports/investigation_benchmark_results.json`.*
+*Measured by `src/sentinelops/evals/run_llm_eval.py` and saved to `evals/results/investigation/`.*
 
 #### Key Investigation Findings
-1. **The Telemetry-Only Ceiling:** With telemetry alone (Modes A & C), the system only knows high-level signals (e.g., `http.error_rate is 0.24`), achieving only **6.67% accuracy** on specific architectural root causes.
-2. **The Knowledge Multiplier:** Adding grounded organizational knowledge retrieval boosts diagnosis accuracy from **6.67% to 70.00%** (a **10.5x improvement**) under deterministic inference, and from **6.67% to 33.33%** under semantic reasoning.
-3. **100% Verification Rate:** In all 120 evaluation runs across all 4 modes, 100% of generated diagnoses passed strict citation verification without fabricating phantom IDs or hallucinating evidence.
+1. **The Telemetry-Only Ceiling:** With telemetry alone (Modes A & C), the system only knows symptom metrics (`http.error_rate is 0.24`), achieving only **6.7% accuracy** on specific architectural root causes.
+2. **The Knowledge Multiplier:** Grounding the agent in organizational runbooks and postmortems increases diagnostic accuracy by **11x to 73.3%** under deterministic correlation, and by **6x to 40.0%** under semantic reasoning.
+3. **Usage & Latency Accounting:** In the absence of an external API key, the semantic provider explicitly runs as an offline heuristic emulator. Latency measures local CPU execution time (~5–20 ms); external network latency and token costs are recorded honestly as `NOT AVAILABLE`.
+4. **Citation Validity vs Grounding:** 100% of cited evidence IDs exist in the incident's collected evidence pool. Claim-level semantic NLI entailment is marked `NOT EVALUATED`.
 
 ---
 
 ## Test Suite Execution Summary
 
 ```
-======================== 139 passed, 1 warning in 4.24s ========================
+======================== 148 passed, 1 warning in 3.30s ========================
 ```
 
 ### Test Count Breakdown
@@ -145,12 +148,13 @@ Evaluated across 30 held-out incident scenarios spanning 5 operational failure d
 | **Retrieval Pipeline** | `tests/unit/test_retrieval_pipeline.py` | Unit | 5 | ✅ Passed |
 | **Qdrant Provider** | `tests/unit/test_qdrant_provider.py` | Unit | 4 | ✅ Passed |
 | **Prompt Injection Defense** | `tests/unit/test_prompt_injection.py` | Unit | 2 | ✅ Passed |
+| **Evaluator Audit Regression** | `tests/unit/test_evaluator_audit.py` | Unit | 9 | ✅ Passed |
 | **Generalization Contract** | `tests/contract/test_generalization.py` | Contract | 13 | ✅ Passed |
 | **Investigation Generalization** | `tests/contract/test_investigation_generalization.py` | Contract | 2 | ✅ Passed |
 | **Knowledge Generalization** | `tests/contract/test_knowledge_generalization.py` | Contract | 4 | ✅ Passed |
 | **Live Pipeline Integration** | `tests/integration/test_pipeline.py` | Integration | 4 | ✅ Passed |
 | **Live Orchestrator Integration**| `tests/integration/test_orchestrator.py` | Integration | 1 | ✅ Passed |
-| **TOTAL** | | | **139** | **ALL GREEN** |
+| **TOTAL** | | | **148** | **ALL GREEN** |
 
 ---
 

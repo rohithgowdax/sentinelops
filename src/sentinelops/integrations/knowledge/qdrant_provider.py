@@ -13,6 +13,7 @@ Supports:
 from __future__ import annotations
 
 import logging
+import time
 import uuid
 from typing import Any
 
@@ -63,6 +64,8 @@ class QdrantKnowledgeProvider(KnowledgeProvider):
         self.embedder = embedding_provider or DeterministicEmbeddingProvider()
         self.reranker = reranker or CrossFeatureReranker()
         self.bm25 = BM25Encoder()
+        self._bm25_fit = False
+        self.last_search_profile: dict[str, float] = {}
 
         if client is not None:
             self._client = client
@@ -73,8 +76,28 @@ class QdrantKnowledgeProvider(KnowledgeProvider):
                 url=url, api_key=api_key, timeout=5.0, check_compatibility=False
             )
 
-
         self._initialized = False
+
+    def _ensure_bm25_fit(self) -> None:
+        """Fit BM25 encoder using existing points in collection if not already fit."""
+        if self._bm25_fit:
+            return
+        try:
+            points, _ = self._client.scroll(
+                collection_name=self.collection_name,
+                limit=1000,
+                with_payload=True,
+            )
+            if points:
+                texts = [
+                    f"{p.payload.get('title', '')} {p.payload.get('section', '')} {p.payload.get('content', '')}"
+                    for p in points
+                    if p.payload
+                ]
+                self.bm25.fit(texts)
+                self._bm25_fit = True
+        except Exception as exc:
+            logger.debug("BM25 auto-fit from Qdrant skipped: %s", exc)
 
     def ensure_collection(self) -> None:
         """Initialize collection and payload indexes if not present."""
@@ -103,6 +126,7 @@ class QdrantKnowledgeProvider(KnowledgeProvider):
                         field_schema=qmodels.PayloadSchemaType.KEYWORD,
                     )
             self._initialized = True
+            self._ensure_bm25_fit()
         except Exception as exc:
             logger.warning("Failed to initialize Qdrant collection: %s", exc)
             raise KnowledgeUnavailableError(f"Qdrant unreachable at {self.url}: {exc}") from exc
@@ -204,43 +228,44 @@ class QdrantKnowledgeProvider(KnowledgeProvider):
 
     async def search(self, query: KnowledgeQuery) -> list[KnowledgeResult]:
         """
-        Execute knowledge search over Qdrant.
+        Execute knowledge search over Qdrant with distinct retrieval modes and profiling.
         """
         try:
             self.ensure_collection()
+            self._ensure_bm25_fit()
         except KnowledgeUnavailableError:
             raise
 
+        t_start = time.perf_counter()
+        t_embed_ms = 0.0
+        t_dense_ms = 0.0
+        t_sparse_ms = 0.0
+        t_fusion_ms = 0.0
+        t_rerank_ms = 0.0
+
         q_filter = self._build_filter(query)
-        q_vec = await self.embedder.embed_query(query.query)
         mode = query.mode
 
-        try:
-            # Query dense candidates from Qdrant
-            # Fetch extra candidates if hybrid or rerank mode
-            fetch_limit = (
-                query.limit * 3
-                if mode in (RetrievalMode.HYBRID, RetrievalMode.HYBRID_PLUS_RERANK)
-                else query.limit
-            )
-            response = self._client.query_points(
-                collection_name=self.collection_name,
-                query=q_vec,
-                query_filter=q_filter,
-                limit=fetch_limit,
-                with_payload=True,
-            )
-            search_response = response.points
-        except Exception as exc:
-            logger.error("Qdrant search error: %s", exc)
-            raise KnowledgeUnavailableError(f"Qdrant search failed: {exc}") from exc
-
-
-        if not search_response:
-            return []
-
-        # If DENSE_ONLY, directly return Qdrant scored points
         if mode == RetrievalMode.DENSE_ONLY:
+            t0 = time.perf_counter()
+            q_vec = await self.embedder.embed_query(query.query)
+            t_embed_ms = (time.perf_counter() - t0) * 1000.0
+
+            t0 = time.perf_counter()
+            try:
+                response = self._client.query_points(
+                    collection_name=self.collection_name,
+                    query=q_vec,
+                    query_filter=q_filter,
+                    limit=query.limit,
+                    with_payload=True,
+                )
+                search_response = response.points
+            except Exception as exc:
+                logger.error("Qdrant search error: %s", exc)
+                raise KnowledgeUnavailableError(f"Qdrant search failed: {exc}") from exc
+            t_dense_ms = (time.perf_counter() - t0) * 1000.0
+
             results: list[KnowledgeResult] = []
             for rank, hit in enumerate(search_response[: query.limit], start=1):
                 payload = hit.payload or {}
@@ -262,18 +287,40 @@ class QdrantKnowledgeProvider(KnowledgeProvider):
                         metadata=payload.get("metadata", {}),
                     )
                 )
+            t_total_ms = (time.perf_counter() - t_start) * 1000.0
+            self.last_search_profile = {
+                "embedding_ms": round(t_embed_ms, 2),
+                "dense_ms": round(t_dense_ms, 2),
+                "sparse_ms": 0.0,
+                "fusion_ms": 0.0,
+                "rerank_ms": 0.0,
+                "total_ms": round(t_total_ms, 2),
+            }
             return results
 
-        # For SPARSE_ONLY, score retrieved candidates via BM25
-        if mode == RetrievalMode.SPARSE_ONLY:
+        elif mode == RetrievalMode.SPARSE_ONLY:
+            t0 = time.perf_counter()
+            try:
+                scroll_pts, _ = self._client.scroll(
+                    collection_name=self.collection_name,
+                    scroll_filter=q_filter,
+                    limit=1000,
+                    with_payload=True,
+                )
+            except Exception as exc:
+                logger.error("Qdrant scroll error: %s", exc)
+                raise KnowledgeUnavailableError(f"Qdrant scroll failed: {exc}") from exc
+
             scored_candidates = []
-            for hit in search_response:
+            for hit in scroll_pts:
                 payload = hit.payload or {}
                 text = f"{payload.get('title', '')} {payload.get('section', '')} {payload.get('content', '')}"
                 bm25_score = self.bm25.score(query.query, text)
                 scored_candidates.append((bm25_score, hit))
 
             scored_candidates.sort(key=lambda x: x[0], reverse=True)
+            t_sparse_ms = (time.perf_counter() - t0) * 1000.0
+
             results = []
             for rank, (score, hit) in enumerate(scored_candidates[: query.limit], start=1):
                 payload = hit.payload or {}
@@ -295,61 +342,123 @@ class QdrantKnowledgeProvider(KnowledgeProvider):
                         metadata=payload.get("metadata", {}),
                     )
                 )
+            t_total_ms = (time.perf_counter() - t_start) * 1000.0
+            self.last_search_profile = {
+                "embedding_ms": 0.0,
+                "dense_ms": 0.0,
+                "sparse_ms": round(t_sparse_ms, 2),
+                "fusion_ms": 0.0,
+                "rerank_ms": 0.0,
+                "total_ms": round(t_total_ms, 2),
+            }
             return results
 
-        # HYBRID & HYBRID_PLUS_RERANK: Reciprocal Rank Fusion (RRF)
-        # Dense ranking from Qdrant hits
-        dense_ranks = {hit.id: rank for rank, hit in enumerate(search_response, start=1)}
+        else:
+            # HYBRID & HYBRID_PLUS_RERANK:
+            t0 = time.perf_counter()
+            q_vec = await self.embedder.embed_query(query.query)
+            t_embed_ms = (time.perf_counter() - t0) * 1000.0
 
-        # Sparse ranking via BM25
-        sparse_scored = []
-        for hit in search_response:
-            payload = hit.payload or {}
-            text = f"{payload.get('title', '')} {payload.get('section', '')} {payload.get('content', '')}"
-            bm25_score = self.bm25.score(query.query, text)
-            sparse_scored.append((hit.id, bm25_score))
-        sparse_scored.sort(key=lambda x: x[1], reverse=True)
-        sparse_ranks = {hid: rank for rank, (hid, _) in enumerate(sparse_scored, start=1)}
-
-        # Combine via RRF (k=60)
-        rrf_k = 60.0
-        fused_hits: list[tuple[float, Any]] = []
-        for hit in search_response:
-            d_rank = dense_ranks[hit.id]
-            s_rank = sparse_ranks.get(hit.id, len(search_response))
-            rrf_score = (1.0 / (rrf_k + d_rank)) + (1.0 / (rrf_k + s_rank))
-            fused_hits.append((rrf_score, hit))
-
-        fused_hits.sort(key=lambda x: x[0], reverse=True)
-
-        candidate_limit = query.limit * 2 if mode == RetrievalMode.HYBRID_PLUS_RERANK else query.limit
-        fused_results: list[KnowledgeResult] = []
-        for rank, (score, hit) in enumerate(fused_hits[:candidate_limit], start=1):
-            payload = hit.payload or {}
-            fused_results.append(
-                KnowledgeResult(
-                    chunk_id=payload.get("chunk_id", ""),
-                    document_id=payload.get("document_id", ""),
-                    document_type=DocumentType(payload.get("document_type", "runbook")),
-                    title=payload.get("title", ""),
-                    service=payload.get("service"),
-                    environment=payload.get("environment"),
-                    severity=payload.get("severity"),
-                    section=payload.get("section", ""),
-                    content=payload.get("content", ""),
-                    source=payload.get("source", ""),
-                    score=round(score * 50.0, 4),
-                    rank=rank,
-                    retrieval_mode="hybrid",
-                    metadata=payload.get("metadata", {}),
+            t0 = time.perf_counter()
+            candidate_k = query.limit * 3
+            try:
+                dense_response = self._client.query_points(
+                    collection_name=self.collection_name,
+                    query=q_vec,
+                    query_filter=q_filter,
+                    limit=candidate_k,
+                    with_payload=True,
                 )
-            )
+                dense_hits = dense_response.points
+            except Exception as exc:
+                logger.error("Qdrant search error: %s", exc)
+                raise KnowledgeUnavailableError(f"Qdrant search failed: {exc}") from exc
+            t_dense_ms = (time.perf_counter() - t0) * 1000.0
 
-        if mode == RetrievalMode.HYBRID_PLUS_RERANK:
-            return await self.reranker.rerank(
-                query=query.query,
-                results=fused_results,
-                top_k=query.limit,
-            )
+            t0 = time.perf_counter()
+            try:
+                scroll_pts, _ = self._client.scroll(
+                    collection_name=self.collection_name,
+                    scroll_filter=q_filter,
+                    limit=1000,
+                    with_payload=True,
+                )
+            except Exception as exc:
+                logger.error("Qdrant scroll error: %s", exc)
+                raise KnowledgeUnavailableError(f"Qdrant scroll failed: {exc}") from exc
 
-        return fused_results
+            sparse_scored = []
+            for hit in scroll_pts:
+                payload = hit.payload or {}
+                text = f"{payload.get('title', '')} {payload.get('section', '')} {payload.get('content', '')}"
+                bm25_score = self.bm25.score(query.query, text)
+                sparse_scored.append((bm25_score, hit))
+            sparse_scored.sort(key=lambda x: x[0], reverse=True)
+            sparse_hits = [hit for _, hit in sparse_scored[:candidate_k]]
+            t_sparse_ms = (time.perf_counter() - t0) * 1000.0
+
+            # Reciprocal Rank Fusion (k=60)
+            t0 = time.perf_counter()
+            dense_ranks = {hit.id: rank for rank, hit in enumerate(dense_hits, start=1)}
+            sparse_ranks = {hit.id: rank for rank, hit in enumerate(sparse_hits, start=1)}
+
+            all_candidate_dict = {}
+            for hit in dense_hits:
+                all_candidate_dict[hit.id] = hit
+            for hit in sparse_hits:
+                all_candidate_dict[hit.id] = hit
+
+            rrf_k = 60.0
+            default_rank = max(len(dense_hits), len(sparse_hits)) + 20
+            fused_candidates: list[tuple[float, Any]] = []
+            for hid, hit in all_candidate_dict.items():
+                d_rank = dense_ranks.get(hid, default_rank)
+                s_rank = sparse_ranks.get(hid, default_rank)
+                rrf_score = (1.0 / (rrf_k + d_rank)) + (1.0 / (rrf_k + s_rank))
+                fused_candidates.append((rrf_score, hit))
+
+            fused_candidates.sort(key=lambda x: x[0], reverse=True)
+            t_fusion_ms = (time.perf_counter() - t0) * 1000.0
+
+            candidate_limit = query.limit * 2 if mode == RetrievalMode.HYBRID_PLUS_RERANK else query.limit
+            fused_results: list[KnowledgeResult] = []
+            for rank, (score, hit) in enumerate(fused_candidates[:candidate_limit], start=1):
+                payload = hit.payload or {}
+                fused_results.append(
+                    KnowledgeResult(
+                        chunk_id=payload.get("chunk_id", ""),
+                        document_id=payload.get("document_id", ""),
+                        document_type=DocumentType(payload.get("document_type", "runbook")),
+                        title=payload.get("title", ""),
+                        service=payload.get("service"),
+                        environment=payload.get("environment"),
+                        severity=payload.get("severity"),
+                        section=payload.get("section", ""),
+                        content=payload.get("content", ""),
+                        source=payload.get("source", ""),
+                        score=round(score * 50.0, 4),
+                        rank=rank,
+                        retrieval_mode="hybrid",
+                        metadata=payload.get("metadata", {}),
+                    )
+                )
+
+            if mode == RetrievalMode.HYBRID_PLUS_RERANK:
+                t0 = time.perf_counter()
+                fused_results = await self.reranker.rerank(
+                    query=query.query,
+                    results=fused_results,
+                    top_k=query.limit,
+                )
+                t_rerank_ms = (time.perf_counter() - t0) * 1000.0
+
+            t_total_ms = (time.perf_counter() - t_start) * 1000.0
+            self.last_search_profile = {
+                "embedding_ms": round(t_embed_ms, 2),
+                "dense_ms": round(t_dense_ms, 2),
+                "sparse_ms": round(t_sparse_ms, 2),
+                "fusion_ms": round(t_fusion_ms, 2),
+                "rerank_ms": round(t_rerank_ms, 2),
+                "total_ms": round(t_total_ms, 2),
+            }
+            return fused_results

@@ -1,0 +1,138 @@
+{
+  "Mode A (Telemetry-only + Deterministic)": {
+    "mode": "Mode A (Telemetry-only + Deterministic)",
+    "scenarios_evaluated": 30,
+    "correct_diagnoses": 2,
+    "root_cause_accuracy": 0.0667,
+    "accuracy_ci_95": {
+      "lower": 0.0185,
+      "upper": 0.2132,
+      "formatted": "6.7% (95% CI: [1.8%, 21.3%])"
+    },
+    "diagnosis_verification_pass_rate": 1.0,
+    "citation_validity_rate": 1.0,
+    "evidence_completeness_rate": 1.0,
+    "claim_level_grounding": "NOT EVALUATED (requires NLI semantic entailment model)",
+    "investigation_loop_rate": 0.0,
+    "max_iteration_termination_rate": 0.0,
+    "latency_seconds": {
+      "mean": 0.0068,
+      "median": 0.0055,
+      "p95": 0.0185
+    },
+    "usage_and_cost": {
+      "provider_mode": "deterministic_rule_engine",
+      "model": "deterministic",
+      "external_api_calls": 0,
+      "input_tokens": "NOT AVAILABLE",
+      "output_tokens": "NOT AVAILABLE",
+      "total_tokens": "NOT AVAILABLE",
+      "estimated_cost_usd": "NOT AVAILABLE",
+      "cost_per_investigation_usd": "NOT AVAILABLE",
+      "external_network_latency_ms": "NOT AVAILABLE",
+      "local_reasoning_latency_ms": 6.82
+    }
+  },
+  "Mode B (Telemetry+Knowledge + Deterministic)": {
+    "mode": "Mode B (Telemetry+Knowledge + Deterministic)",
+    "scenarios_evaluated": 30,
+    "correct_diagnoses": 22,
+    "root_cause_accuracy": 0.7333,
+    "accuracy_ci_95": {
+      "lower": 0.5555,
+      "upper": 0.8582,
+      "formatted": "73.3% (95% CI: [55.5%, 85.8%])"
+    },
+    "diagnosis_verification_pass_rate": 1.0,
+    "citation_validity_rate": 1.0,
+    "evidence_completeness_rate": 1.0,
+    "claim_level_grounding": "NOT EVALUATED (requires NLI semantic entailment model)",
+    "investigation_loop_rate": 0.0,
+    "max_iteration_termination_rate": 0.0,
+    "latency_seconds": {
+      "mean": 0.0213,
+      "median": 0.0202,
+      "p95": 0.0263
+    },
+    "usage_and_cost": {
+      "provider_mode": "deterministic_rule_engine",
+      "model": "deterministic",
+      "external_api_calls": 0,
+      "input_tokens": "NOT AVAILABLE",
+      "output_tokens": "NOT AVAILABLE",
+      "total_tokens": "NOT AVAILABLE",
+      "estimated_cost_usd": "NOT AVAILABLE",
+      "cost_per_investigation_usd": "NOT AVAILABLE",
+      "external_network_latency_ms": "NOT AVAILABLE",
+      "local_reasoning_latency_ms": 21.34
+    }
+  },
+  "Mode C (Telemetry-only + Semantic LLM)": {
+    "mode": "Mode C (Telemetry-only + Semantic LLM)",
+    "scenarios_evaluated": 30,
+    "correct_diagnoses": 2,
+    "root_cause_accuracy": 0.0667,
+    "accuracy_ci_95": {
+      "lower": 0.0185,
+      "upper": 0.2132,
+      "formatted": "6.7% (95% CI: [1.8%, 21.3%])"
+    },
+    "diagnosis_verification_pass_rate": 1.0,
+    "citation_validity_rate": 1.0,
+    "evidence_completeness_rate": 1.0,
+    "claim_level_grounding": "NOT EVALUATED (requires NLI semantic entailment model)",
+    "investigation_loop_rate": 0.0,
+    "max_iteration_termination_rate": 0.0,
+    "latency_seconds": {
+      "mean": 0.0059,
+      "median": 0.0051,
+      "p95": 0.0094
+    },
+    "usage_and_cost": {
+      "provider_mode": "offline_semantic_emulator",
+      "model": "gpt-4o-mini",
+      "external_api_calls": 0,
+      "input_tokens": "NOT AVAILABLE",
+      "output_tokens": "NOT AVAILABLE",
+      "total_tokens": "NOT AVAILABLE",
+      "estimated_cost_usd": "NOT AVAILABLE",
+      "cost_per_investigation_usd": "NOT AVAILABLE",
+      "external_network_latency_ms": "NOT AVAILABLE",
+      "local_emulator_latency_ms": 1.52
+    }
+  },
+  "Mode D (Telemetry+Knowledge + Semantic LLM)": {
+    "mode": "Mode D (Telemetry+Knowledge + Semantic LLM)",
+    "scenarios_evaluated": 30,
+    "correct_diagnoses": 12,
+    "root_cause_accuracy": 0.4,
+    "accuracy_ci_95": {
+      "lower": 0.2459,
+      "upper": 0.5768,
+      "formatted": "40.0% (95% CI: [24.6%, 57.7%])"
+    },
+    "diagnosis_verification_pass_rate": 1.0,
+    "citation_validity_rate": 1.0,
+    "evidence_completeness_rate": 1.0,
+    "claim_level_grounding": "NOT EVALUATED (requires NLI semantic entailment model)",
+    "investigation_loop_rate": 0.0,
+    "max_iteration_termination_rate": 0.0,
+    "latency_seconds": {
+      "mean": 0.0198,
+      "median": 0.0187,
+      "p95": 0.0272
+    },
+    "usage_and_cost": {
+      "provider_mode": "offline_semantic_emulator",
+      "model": "gpt-4o-mini",
+      "external_api_calls": 0,
+      "input_tokens": "NOT AVAILABLE",
+      "output_tokens": "NOT AVAILABLE",
+      "total_tokens": "NOT AVAILABLE",
+      "estimated_cost_usd": "NOT AVAILABLE",
+      "cost_per_investigation_usd": "NOT AVAILABLE",
+      "external_network_latency_ms": "NOT AVAILABLE",
+      "local_emulator_latency_ms": 3.45
+    }
+  }
+}

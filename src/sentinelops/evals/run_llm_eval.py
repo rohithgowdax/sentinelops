@@ -4,20 +4,21 @@ Incident Investigation Benchmark Suite for SentinelOps.
 Executes 30 held-out incident investigations across 4 ablation configurations:
 - Mode A: Telemetry-Only + Deterministic LLM Provider
 - Mode B: Telemetry + Knowledge + Deterministic LLM Provider
-- Mode C: Telemetry-Only + Real LLM Provider
-- Mode D: Telemetry + Knowledge + Real LLM Provider
+- Mode C: Telemetry-Only + Semantic LLM Provider
+- Mode D: Telemetry + Knowledge + Semantic LLM Provider
 
 Evaluates:
-- Root-cause accuracy
-- Citation correctness / evidence validity
-- Groundedness (zero phantom/fabricated IDs)
-- Verification success rate
-- Investigation iteration loop rate
-- Wall-clock latency and token usage
+- Root-cause accuracy with Wilson 95% confidence intervals
+- Diagnosis verification pass rate (verifier approval to DIAGNOSED)
+- Citation validity (provenance existence in collected evidence)
+- Evidence completeness (telemetry + knowledge separation)
+- Stage-level latencies (telemetry, knowledge, LLM reasoning, graph execution, total wall clock)
+- Token & cost accounting (or NOT AVAILABLE when running offline)
 
 Invariants:
 - Zero fabricated metrics.
 - Uses real LangGraph investigation execution.
+- Separates local deterministic/heuristic reasoning from external API metrics.
 """
 from __future__ import annotations
 
@@ -25,6 +26,8 @@ import argparse
 import asyncio
 import json
 import logging
+import math
+import statistics
 import time
 from pathlib import Path
 from typing import Any
@@ -49,6 +52,22 @@ from sentinelops.integrations.knowledge.qdrant_provider import QdrantKnowledgePr
 logger = logging.getLogger(__name__)
 
 
+def compute_wilson_ci(k: int, n: int, confidence: float = 0.95) -> tuple[float, float]:
+    """
+    Compute Wilson score interval for a binomial proportion.
+    """
+    if n == 0:
+        return 0.0, 0.0
+    z = 1.95996  # 95% confidence
+    p = k / n
+    denominator = 1.0 + (z**2) / n
+    center_adj = p + (z**2) / (2.0 * n)
+    margin = z * math.sqrt((p * (1.0 - p) + (z**2) / (4.0 * n)) / n)
+    lower = max(0.0, (center_adj - margin) / denominator)
+    upper = min(1.0, (center_adj + margin) / denominator)
+    return round(lower, 4), round(upper, 4)
+
+
 def build_mock_evidence_provider(scenario: IncidentScenario) -> Any:
     """Construct an evidence provider serving the scenario's telemetry."""
     provider = AsyncMock()
@@ -70,19 +89,21 @@ async def evaluate_single_mode(
     llm_provider: Any,
     knowledge_provider: Any | None,
     scenarios: list[IncidentScenario],
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """
     Run 30 incidents through the LangGraph graph under a specific configuration.
+    Returns (aggregate_metrics, per_incident_records).
     """
     total = len(scenarios)
     diagnosed_count = 0
     accurate_count = 0
-    valid_citation_count = 0
     total_citations = 0
-    invalid_citations = 0
+    valid_citations = 0
     loop_count = 0
     max_iteration_count = 0
-    latencies: list[float] = []
+    complete_evidence_count = 0
+    latencies_s: list[float] = []
+    per_incident_records: list[dict[str, Any]] = []
 
     for scenario in scenarios:
         ev_prov = build_mock_evidence_provider(scenario)
@@ -119,11 +140,12 @@ async def evaluate_single_mode(
         config = {"configurable": {"thread_id": f"{mode_name}-{scenario.scenario_id}"}}
         final_state = await graph.ainvoke(initial_state, config=config)
         elapsed = time.perf_counter() - t0
-        latencies.append(elapsed)
+        latencies_s.append(elapsed)
 
         res: InvestigationResult = final_state["final_result"]
 
-        if res.status == InvestigationStatus.DIAGNOSED:
+        is_diagnosed = res.status == InvestigationStatus.DIAGNOSED
+        if is_diagnosed:
             diagnosed_count += 1
 
         if res.iteration_count > 1:
@@ -131,55 +153,125 @@ async def evaluate_single_mode(
         if res.iteration_count >= 3:
             max_iteration_count += 1
 
-        # Evaluate root-cause accuracy
+        # Accuracy evaluation
+        is_accurate = False
+        rc_text = ""
         if res.diagnosis:
             rc_text = (res.diagnosis.root_cause + " " + res.diagnosis.explanation).lower()
             if scenario.expected_root_cause_concept.lower() in rc_text:
+                is_accurate = True
                 accurate_count += 1
 
-            # Evaluate citation validity
-            collected_ids = {e.evidence_id for e in res.supporting_evidence}
-            cited_ids = res.diagnosis.supporting_evidence
-            total_citations += len(cited_ids)
-            for cid in cited_ids:
-                if cid not in collected_ids:
-                    invalid_citations += 1
+        # Citation validity & completeness
+        collected_ids = {e.evidence_id for e in res.supporting_evidence}
+        cited_ids = res.diagnosis.supporting_evidence if res.diagnosis else []
+        total_citations += len(cited_ids)
+        invalid_in_incident = 0
+        for cid in cited_ids:
+            if cid in collected_ids:
+                valid_citations += 1
+            else:
+                invalid_in_incident += 1
 
-    citation_validity = 1.0 if total_citations == 0 else (1.0 - (invalid_citations / total_citations))
-    groundedness = round(citation_validity, 4)
+        has_telemetry = len(res.telemetry_evidence) > 0
+        has_knowledge = len(res.knowledge_evidence) > 0
+        if knowledge_provider is not None:
+            is_complete = has_telemetry and has_knowledge
+        else:
+            is_complete = has_telemetry
+        if is_complete:
+            complete_evidence_count += 1
 
-    return {
+        per_incident_records.append({
+            "mode": mode_name,
+            "scenario_id": scenario.scenario_id,
+            "category": scenario.category,
+            "incident_id": scenario.incident.incident_id,
+            "service": scenario.incident.service_name,
+            "expected_concept": scenario.expected_root_cause_concept,
+            "status": res.status.value,
+            "is_diagnosed": is_diagnosed,
+            "is_accurate": is_accurate,
+            "confidence": res.confidence,
+            "iteration_count": res.iteration_count,
+            "cited_evidence_count": len(cited_ids),
+            "invalid_citations_count": invalid_in_incident,
+            "telemetry_evidence_count": len(res.telemetry_evidence),
+            "knowledge_evidence_count": len(res.knowledge_evidence),
+            "duration_seconds": round(elapsed, 4),
+            "diagnosis_root_cause": res.diagnosis.root_cause if res.diagnosis else None,
+        })
+
+    citation_validity = 1.0 if total_citations == 0 else (valid_citations / total_citations)
+    accuracy = accurate_count / total
+    ci_low, ci_high = compute_wilson_ci(accurate_count, total, confidence=0.95)
+
+    sorted_lats = sorted(latencies_s)
+    p50_idx = int(total * 0.50)
+    p95_idx = min(total - 1, int(total * 0.95))
+
+    accounting = {}
+    if hasattr(llm_provider, "get_usage_accounting"):
+        accounting = llm_provider.get_usage_accounting()
+    else:
+        accounting = {
+            "provider_mode": "deterministic_rule_engine",
+            "model": "deterministic",
+            "external_api_calls": 0,
+            "input_tokens": "NOT AVAILABLE",
+            "output_tokens": "NOT AVAILABLE",
+            "total_tokens": "NOT AVAILABLE",
+            "estimated_cost_usd": "NOT AVAILABLE",
+            "cost_per_investigation_usd": "NOT AVAILABLE",
+            "external_network_latency_ms": "NOT AVAILABLE",
+            "local_reasoning_latency_ms": round(sum(latencies_s) / total * 1000.0, 2),
+        }
+
+    aggregate = {
         "mode": mode_name,
         "scenarios_evaluated": total,
-        "verification_success_rate": round(diagnosed_count / total, 4),
-        "root_cause_accuracy": round(accurate_count / total, 4),
-        "citation_validity": round(citation_validity, 4),
-        "groundedness": groundedness,
-        "unsupported_diagnosis_rate": round(invalid_citations / max(1, total_citations), 4),
+        "correct_diagnoses": accurate_count,
+        "root_cause_accuracy": round(accuracy, 4),
+        "accuracy_ci_95": {
+            "lower": ci_low,
+            "upper": ci_high,
+            "formatted": f"{accuracy:.1%} (95% CI: [{ci_low:.1%}, {ci_high:.1%}])",
+        },
+        "diagnosis_verification_pass_rate": round(diagnosed_count / total, 4),
+        "citation_validity_rate": round(citation_validity, 4),
+        "evidence_completeness_rate": round(complete_evidence_count / total, 4),
+        "claim_level_grounding": "NOT EVALUATED (requires NLI semantic entailment model)",
         "investigation_loop_rate": round(loop_count / total, 4),
         "max_iteration_termination_rate": round(max_iteration_count / total, 4),
-        "avg_duration_seconds": round(sum(latencies) / total, 3),
-        "p95_duration_seconds": round(sorted(latencies)[int(total * 0.95)], 3),
+        "latency_seconds": {
+            "mean": round(statistics.mean(latencies_s), 4),
+            "median": round(sorted_lats[p50_idx], 4),
+            "p95": round(sorted_lats[p95_idx], 4),
+        },
+        "usage_and_cost": accounting,
     }
+    return aggregate, per_incident_records
 
 
 async def run_full_investigation_evaluation(
+    provider_filter: str = "all",
     qdrant_url: str | None = None,
     collection_name: str | None = None,
     output_dir: Path | None = None,
 ) -> dict[str, Any]:
     """
-    Run the 4-mode ablation evaluation over 30 incident scenarios.
+    Run investigation ablation benchmark with machine-readable logging.
     """
     settings = get_settings()
     url = qdrant_url or settings.qdrant_url
     collection = collection_name or settings.qdrant_collection
-    out_dir = output_dir or Path("docs/reports")
+    out_dir = output_dir or Path("evals/results/investigation")
+    reports_dir = Path("docs/reports")
     out_dir.mkdir(parents=True, exist_ok=True)
+    reports_dir.mkdir(parents=True, exist_ok=True)
 
-    # Initialize providers
     deterministic_llm = DeterministicLLMProvider()
-    real_llm = RealLLMProvider(
+    semantic_llm = RealLLMProvider(
         model=settings.llm_model,
         api_key=settings.llm_api_key,
         base_url=settings.llm_base_url,
@@ -187,38 +279,81 @@ async def run_full_investigation_evaluation(
     knowledge_prov = QdrantKnowledgeProvider(url=url, collection_name=collection)
     knowledge_prov.ensure_collection()
 
-    modes = [
-        ("Mode A (Telemetry-only + Deterministic)", deterministic_llm, None),
-        ("Mode B (Telemetry+Knowledge + Deterministic)", deterministic_llm, knowledge_prov),
-        ("Mode C (Telemetry-only + Real LLM)", real_llm, None),
-        ("Mode D (Telemetry+Knowledge + Real LLM)", real_llm, knowledge_prov),
+    all_modes = [
+        ("Mode A (Telemetry-only + Deterministic)", deterministic_llm, None, "deterministic"),
+        ("Mode B (Telemetry+Knowledge + Deterministic)", deterministic_llm, knowledge_prov, "deterministic"),
+        ("Mode C (Telemetry-only + Semantic LLM)", semantic_llm, None, "real"),
+        ("Mode D (Telemetry+Knowledge + Semantic LLM)", semantic_llm, knowledge_prov, "real"),
     ]
 
-    all_results: dict[str, Any] = {}
-    print(f"\n=======================================================")
-    print(f"SentinelOps Investigation Ablation Benchmark (30 Incidents)")
-    print(f"=======================================================\n")
+    if provider_filter == "deterministic":
+        selected_modes = [m for m in all_modes if m[3] == "deterministic"]
+    elif provider_filter == "real":
+        selected_modes = [m for m in all_modes if m[3] == "real"]
+    else:
+        selected_modes = all_modes
 
-    for mode_name, llm, kp in modes:
-        mode_res = await evaluate_single_mode(mode_name, llm, kp, INCIDENT_BENCHMARK_SCENARIOS)
-        all_results[mode_name] = mode_res
+    all_results: dict[str, Any] = {}
+    all_incident_records: list[dict[str, Any]] = []
+
+    print(f"\n=========================================================================")
+    print(f"SentinelOps Investigation Benchmark ({len(INCIDENT_BENCHMARK_SCENARIOS)} Incidents | Provider: {provider_filter})")
+    print(f"=========================================================================\n")
+
+    for mode_name, llm, kp, _ in selected_modes:
+        agg, inc_recs = await evaluate_single_mode(mode_name, llm, kp, INCIDENT_BENCHMARK_SCENARIOS)
+        all_results[mode_name] = agg
+        all_incident_records.extend(inc_recs)
+
+        ci_str = agg["accuracy_ci_95"]["formatted"]
         print(
             f"{mode_name:<44} | "
-            f"Accuracy: {mode_res['root_cause_accuracy']:.2%} | "
-            f"Verified: {mode_res['verification_success_rate']:.2%} | "
-            f"Grounded: {mode_res['groundedness']:.2%} | "
-            f"Avg Time: {mode_res['avg_duration_seconds']:.3f}s"
+            f"Accuracy: {ci_str:<26} | "
+            f"Verified: {agg['diagnosis_verification_pass_rate']:.1%} | "
+            f"Citation Valid: {agg['citation_validity_rate']:.1%} | "
+            f"Duration (p50/p95): {agg['latency_seconds']['median']:.3f}/{agg['latency_seconds']['p95']:.3f}s"
         )
 
-    # Save to report JSON
-    report_path = out_dir / "investigation_benchmark_results.json"
-    report_data = {
+    # Save benchmark manifest
+    manifest = {
+        "benchmark_name": "sentinelops-incident-investigation-ablation",
+        "benchmark_version": "slice3-v2-hardened",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "scenario_count": len(INCIDENT_BENCHMARK_SCENARIOS),
+        "provider_filter": provider_filter,
+        "external_api_configured": semantic_llm.is_external_configured,
+        "evaluation_notice": (
+            "This benchmark is an engineering evaluation set, not a statistically "
+            "representative estimate of production incident accuracy."
+        ),
+    }
+    manifest_path = out_dir / "benchmark_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    # Save per-incident results jsonl
+    jsonl_path = out_dir / "per_incident_results.jsonl"
+    with open(jsonl_path, "w", encoding="utf-8") as f:
+        for rec in all_incident_records:
+            f.write(json.dumps(rec) + "\n")
+
+    # Save aggregate results json
+    agg_path = out_dir / "aggregate_results.json"
+    agg_path.write_text(json.dumps(all_results, indent=2), encoding="utf-8")
+
+    # Save legacy report path for docs
+    legacy_path = reports_dir / "investigation_benchmark_results.json"
+    report_data = {
+        "manifest": manifest,
         "scenario_count": len(INCIDENT_BENCHMARK_SCENARIOS),
         "results": all_results,
     }
-    report_path.write_text(json.dumps(report_data, indent=2), encoding="utf-8")
-    print(f"\nSaved machine-readable report to: {report_path}\n")
+    legacy_path.write_text(json.dumps(report_data, indent=2), encoding="utf-8")
+
+    print(f"\nSaved artifacts:")
+    print(f"  - {manifest_path}")
+    print(f"  - {jsonl_path}")
+    print(f"  - {agg_path}")
+    print(f"  - {legacy_path}\n")
 
     return all_results
 
@@ -226,13 +361,21 @@ async def run_full_investigation_evaluation(
 def main() -> None:
     """CLI entrypoint for investigation ablation benchmark."""
     parser = argparse.ArgumentParser(description="SentinelOps Investigation Benchmark")
+    parser.add_argument(
+        "--provider",
+        type=str,
+        default="all",
+        choices=["all", "deterministic", "real"],
+        help="Provider filter: all, deterministic, or real",
+    )
     parser.add_argument("--qdrant-url", type=str, default="http://localhost:6333")
     parser.add_argument("--collection", type=str, default="sentinelops_knowledge")
-    parser.add_argument("--output-dir", type=Path, default=Path("docs/reports"))
+    parser.add_argument("--output-dir", type=Path, default=Path("evals/results/investigation"))
     args = parser.parse_args()
 
     asyncio.run(
         run_full_investigation_evaluation(
+            provider_filter=args.provider,
             qdrant_url=args.qdrant_url,
             collection_name=args.collection,
             output_dir=args.output_dir,
