@@ -301,11 +301,43 @@ Terminal immutable record of the completed investigation.
 
 ---
 
-## What is Excluded
+## Slice 4: Controlled Remediation Domain Models
 
-The domain model intentionally excludes:
-- Vendor-specific field names (`err_pct`, `svc`, `timeUnixNano`, etc.)
-- HTTP/transport-layer fields
-- Remediation execution or mutation commands (Slice 2 is strictly read-only investigation)
-- Vector embeddings or RAG indices (deferred to future slices)
+### `ActionType` & `RiskClass`
+```python
+class ActionType(str, Enum):
+    RESTART_SERVICE = "restart_service"
+    ROLLBACK_DEPLOYMENT = "rollback_deployment"
+    SCALE_SERVICE = "scale_service"
+    # Destructive / explicitly denied:
+    DELETE_RESOURCE = "delete_resource"
+    MODIFY_DATABASE = "modify_database"
+    EXECUTE_COMMAND = "execute_command"
+    RUN_SHELL = "run_shell"
+
+class RiskClass(str, Enum):
+    READ = "read"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+```
+
+### `ActionRequest` & `ActionResult`
+Canonical, provider-neutral action payload and execution result.
+
+| Model | Key Fields | Invariants |
+|---|---|---|
+| `ActionRequest` | `action_id`, `incident_id`, `action_type`, `target: TargetResource`, `parameters: dict`, `rationale: str`, `supporting_evidence: list[str]`, `risk_class: RiskClass`, `environment: str` | Zero raw shell strings or provider APIs; citations must match verified diagnosis |
+| `ActionResult` | `action_id`, `status: ActionStatus`, `provider: str`, `started_at`, `completed_at`, `output: dict`, `error: str\|None` | Immutable outcome record; cached by provider for idempotency |
+
+### Policy Models
+- `ActorRole`: `OPERATOR` (10) < `SRE` (20) < `INCIDENT_COMMANDER` (30) < `ADMIN` (40)
+- `ActorContext`: Authenticated actor ID, role, and hierarchy evaluation
+- `PolicyDecision`: `decision` (`ALLOW`, `REQUIRES_APPROVAL`, `DENY`), `required_role`, `matched_rule_id`, `reason`
+- `PolicyRule`: Declarative tuple matching `(action_type, environment)` against decisions and roles
+
+### Remediation Verification Models
+- `MetricCheckResult`: Before vs after telemetry values, threshold comparison, and health status
+- `RemediationVerificationResult`: Status (`RECOVERED`, `NOT_RECOVERED`, `INCONCLUSIVE`), checks list, and confidence
 

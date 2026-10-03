@@ -106,10 +106,22 @@ Both tests pass with 100% success rate.
 
 ---
 
-## Planned for Slice 4+ (Remediation & Policy)
+---
 
-When remediation execution is implemented in future slices, the policy and security layer will include:
-1. **Open Policy Agent (OPA) / Rego Rules:** Evaluating blast radius, change windows, service tier, and production lockout rules.
-2. **ActionRequest Risk Scoring:** Deterministic scoring of proposed remediation actions (LOW, MEDIUM, HIGH, CRITICAL).
-3. **Asynchronous HITL Approval Gateway:** Interactive Slack/CLI/Webhooks approvals with cryptographic signatures and expiration timeouts.
-4. **Append-Only Audit Ledger:** Immutable hash-chained audit logging for every decision, approval, and execution result.
+## Slice 4 Implemented: Controlled Remediation & Deterministic Policy Gating
+
+In Slice 4, full declarative policy gating and human-in-the-loop controls were implemented and verified:
+1. **Deterministic Declarative Policy Engine (`src/sentinelops/policy/engine.py`):**
+   - Rules match `(action_type, environment)` against declarative decisions (`ALLOW`, `REQUIRES_APPROVAL`, `DENY`).
+   - Universally denies destructive actions: `DELETE_RESOURCE`, `MODIFY_DATABASE`, `EXECUTE_COMMAND`, `RUN_SHELL`.
+   - Requires `INCIDENT_COMMANDER` role for production rollbacks and `SRE` role for production restarts/scaling.
+2. **Human-in-the-Loop (HITL) Gateway (`src/sentinelops/approval/`):**
+   - LangGraph `interrupt()` suspends high-risk execution.
+   - REST API exposes `/api/v1/approvals` for RBAC signoff.
+   - Resumption is achieved via `Command(resume=...)`.
+3. **Execution Guardrails & Anti-Replay:**
+   - One-time approval consumption (`is_consumed = True`).
+   - Pre-execution parameter tampering detection.
+   - Strictly idempotent mock execution providers.
+4. **Adversarial Security Test Proofs (`tests/security/test_remediation_security.py`):**
+   - 6 adversarial tests pass with 100% defense against destructive commands, bypasses, parameter manipulation, unauthorized approval, replay attacks, and prompt injection.

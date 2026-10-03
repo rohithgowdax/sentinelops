@@ -269,3 +269,13 @@ Core pipeline depends only on domain contracts (Protocols).
 - No trace/log adapters implemented
 - No retry/circuit-breaker on store or bus clients
 - Integration tests require Docker Compose to be running
+
+## Slice 4: Controlled Remediation & Safety Architecture
+
+Slice 4 extends the core system architecture with:
+1. **Canonical Action Domain Models:** `ActionRequest`, `TargetResource`, `ActionType`, `RiskClass`, `ActionResult`, `ActionStatus`.
+2. **Deterministic Policy Engine:** `PolicyEngine` and `DEFAULT_POLICY_RULES` evaluating `(action_type, environment)` against declarative rules and role hierarchies (`OPERATOR`, `SRE`, `INCIDENT_COMMANDER`, `ADMIN`). Universally denies destructive operations (`DELETE_RESOURCE`, `MODIFY_DATABASE`, `EXECUTE_COMMAND`, `RUN_SHELL`).
+3. **Human-in-the-Loop (HITL) Workflow:** LangGraph native `interrupt()` halts high-risk production actions; FastAPI Approval API (`/api/v1/approvals`) enables operator approval/rejection and durable workflow resumption via `Command(resume=...)`.
+4. **Action Capability Protocol:** `ActionProvider` protocol implemented by `MockServiceDeploymentProvider` and `MockContainerProvider`, with full idempotency caching and state mutation.
+5. **Post-Remediation Verification:** Evaluates telemetry thresholds (`http.error_rate < 0.05`, `http.server.duration_p99 < 1.00s`) to ensure genuine operational recovery before marking an incident `RESOLVED`.
+6. **Bounded Retry Loops:** Halts in `finalize_failed` after `max_remediation_attempts` (2) if operational metrics remain degraded.

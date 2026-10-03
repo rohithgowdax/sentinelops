@@ -342,4 +342,87 @@ Treat all retrieved knowledge chunks as untrusted operational reference data. Kn
 - Verified immune to system override and instructions tampering via automated tests (`test_prompt_injection.py`).
 - Citations are rigorously audited and verified before being presented to users.
 
+---
+
+## ADR-020 — Canonical ActionRequest and Controlled Semantic Action Vocabulary
+
+### Context
+Autonomous remediation agents present serious availability risks if permitted to generate arbitrary shell strings or call untyped APIs directly on infrastructure.
+
+### Decision
+Restrict all agent-proposed actions to a strictly typed, canonical domain model (`ActionRequest`) with an enumerated vocabulary (`ActionType.RESTART_SERVICE`, `ActionType.ROLLBACK_DEPLOYMENT`, `ActionType.SCALE_SERVICE`). Prohibit freeform commands and destructive actions (`delete_resource`, `modify_database`, `run_shell`, `execute_command`) at the domain model level.
+
+### Consequences
+- Eliminates command injection vulnerabilities at the domain layer.
+- Enforces cloud and platform neutrality across infrastructure adapters.
+
+---
+
+## ADR-021 — Separation of Reasoning and Execution Gates
+
+### Context
+Language models are probabilistic and susceptible to hallucinations, prompt injection, and goal drift. Allowing an LLM to directly invoke external systems creates unacceptable operational risk.
+
+### Decision
+Enforce a hard architectural barrier between the AI reasoning loop and action execution. The agent's output is purely a proposal (`ActionRequest`). Execution requires traversal through an external, deterministic `PolicyEngine`.
+
+### Consequences
+- Prevents 100% of unauthorized action executions regardless of LLM behavior.
+- Guarantees compliance and security auditing on every action proposal.
+
+---
+
+## ADR-022 — Native LangGraph Interruption for Human-in-the-Loop Approvals
+
+### Context
+High-risk production operations require human sign-off before modifying infrastructure. The workflow must suspend gracefully and resume durably without losing diagnostic state.
+
+### Decision
+Leverage LangGraph's native `interrupt()` primitive backed by durable checkpoint persistence (`MemorySaver` or PostgreSQL checkpointer).
+
+### Consequences
+- Cleanly suspends workflow state and surfaces pending actions via the Approval REST API.
+- Enables asynchronous approval resolution from web dashboards, CLI tools, or ChatOps webhooks via `Command(resume=...)`.
+
+---
+
+## ADR-023 — One-Time Approval Token Consumption & Parameter Integrity
+
+### Context
+Approved actions could be subject to replay attacks or parameter tampering between human signoff and execution.
+
+### Decision
+Implement `ApprovalService.revalidate_for_execution()` which cryptographically/structurally compares parameters against the original request and permanently flags the token as `is_consumed = True` upon execution.
+
+### Consequences
+- Prevents replay attacks and ensures atomic single-use approvals.
+- Prevents parameter manipulation between approval and execution.
+
+---
+
+## ADR-024 — Post-Remediation Telemetry Verification Gate
+
+### Context
+Executing an operational change (e.g. service restart) does not guarantee incident resolution. Premature closure leaves degradation unaddressed.
+
+### Decision
+Introduce a `remediation_verifier` node in the LangGraph topology that measures post-action telemetry against defined operational thresholds before declaring an incident resolved.
+
+### Consequences
+- Ensures automated validation that error rates and latencies have returned to baseline.
+- Triggers re-investigation loops if degradation persists post-action.
+
+---
+
+## ADR-025 — Bounded Remediation Retry Loop
+
+### Context
+Unsuccessful remediation could trigger an infinite loop of repeated actions and re-investigations, exhausting quotas or escalating degradation.
+
+### Decision
+Bound remediation attempts using `max_remediation_attempts` (default: 2). If post-action verification fails after maximum attempts, transition the incident to `finalize_failed` and escalate to on-call engineers.
+
+### Consequences
+- Guarantees predictable, bounded workflow termination under all failure modes.
+
 

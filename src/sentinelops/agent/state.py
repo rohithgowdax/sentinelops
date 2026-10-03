@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
+from sentinelops.domain.models.action import ActionRequest, ActionResult
 from sentinelops.domain.models.incident import Incident
 from sentinelops.domain.models.investigation import (
     Diagnosis,
@@ -22,6 +23,8 @@ from sentinelops.domain.models.investigation import (
     InvestigationStatus,
     VerificationResult,
 )
+from sentinelops.domain.models.policy import PolicyDecision
+from sentinelops.domain.models.verification import RemediationVerificationResult
 
 
 class InvestigationState(TypedDict):
@@ -68,4 +71,12 @@ class InvestigationState(TypedDict):
     knowledge_queries: list[str]
     knowledge_available: bool
     retrieval_mode: str
+    # Slice 4 Controlled Remediation extensions
+    action_request: ActionRequest | None
+    policy_decision: PolicyDecision | None
+    action_result: ActionResult | None
+    remediation_verification: RemediationVerificationResult | None
+    remediation_attempts: int
+    max_remediation_attempts: int
+    remediation_status: str
 

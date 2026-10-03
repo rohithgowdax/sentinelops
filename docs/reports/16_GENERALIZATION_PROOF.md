@@ -238,6 +238,35 @@ Automated test `test_graceful_fallback_when_knowledge_unavailable`:
 
 ---
 
+## 5. Slice 4 Proof: Controlled Remediation Generalization
+
+### Proof 1: ActionProvider Protocol Conformance
+Automated test `test_protocol_conformance` verifies that both implementations:
+- `MockServiceDeploymentProvider`
+- `MockContainerProvider`
+satisfy the `ActionProvider` Protocol at the class structure level.
+
+### Proof 2: Zero Provider Branching in Remediation AST
+Automated test `test_zero_provider_branching_in_remediation_ast` parses the AST of `remediation_planner.py`, `policy_evaluator.py`, `action_executor.py`, and `remediation_verifier.py`. Confirms zero comparison or branching on provider names (`"mock_service_deployment_provider"`, `"mock_container_provider"`, `"kubernetes"`, `"ecs"`, `"aws"`, `"docker"`).
+
+### Proof 3: Cross-Provider Canonical Action Execution
+Automated test `test_canonical_action_execution_across_providers`:
+1. Constructs an identical canonical `ActionRequest` (`action_type=RESTART_SERVICE`).
+2. Validates and executes on both `MockServiceDeploymentProvider` and `MockContainerProvider`.
+3. Proves both return `ActionStatus.SUCCEEDED` with the same `action_id`.
+
+### Proof 4: Idempotency Enforced Across Providers
+Automated test `test_idempotency_enforced_across_providers`:
+1. Submits duplicate action executions to both providers.
+2. Proves both providers return cached identical `ActionResult` objects.
+
+### Proof 5: LangGraph Flow Equivalence Across Providers
+Automated test `test_langgraph_flow_equivalence_across_providers`:
+1. Executes the complete investigation and remediation LangGraph flow.
+2. Confirms both providers drive the incident to `status == InvestigationStatus.RESOLVED` and `remediation_status == "resolved"`.
+
+---
+
 ## Summary
 
 | Proof Component | Test Count | Result |
@@ -252,19 +281,24 @@ Automated test `test_graceful_fallback_when_knowledge_unavailable`:
 | KnowledgeProvider protocol conformance (Slice 3) | 1 | ✅ Passed |
 | Equivalent canonical knowledge results across stores (Slice 3) | 1 | ✅ Passed |
 | Graceful degradation on knowledge outage (Slice 3) | 1 | ✅ Passed |
-| **Total generalization contract tests** | **19** | **✅ 19/19 passed** |
+| ActionProvider protocol conformance (Slice 4) | 1 | ✅ Passed |
+| Zero provider branching in Remediation AST (Slice 4) | 1 | ✅ Passed |
+| Cross-provider canonical action execution (Slice 4) | 1 | ✅ Passed |
+| Idempotency enforced across providers (Slice 4) | 1 | ✅ Passed |
+| LangGraph flow equivalence across providers (Slice 4) | 1 | ✅ Passed |
+| **Total generalization contract tests** | **24** | **✅ 24/24 passed** |
 
 ---
 
 ## What This Proves About Architecture
 
-The generalization proofs across Slices 1, 2, and 3 demonstrate that:
+The generalization proofs across Slices 1, 2, 3, and 4 demonstrate that:
 
 1. **Adapter isolation is complete.** All telemetry provider-specific logic is contained within `normalize()`.
 2. **Detection engine is provider-neutral by construction.** Operates exclusively on canonical types.
 3. **Agent reasoning is decoupled from storage and telemetry vendors.** Queries operational context solely via `TelemetryEvidenceProvider`.
 4. **Agent reasoning is decoupled from vector databases.** Communicates with organizational knowledge solely via `KnowledgeProvider`.
-5. **System is resilient to knowledge outages.** If Qdrant or external knowledge fails, the agent continues investigating using live telemetry without breaking state or crashing.
-6. **Adding new providers requires zero changes to core business logic.** Telemetry adapters and knowledge providers plug in cleanly behind standard interfaces.
+5. **Remediation planning and policy are cloud-agnostic.** Operates exclusively on canonical `ActionRequest` and `ActionResult` domain models.
+6. **Action providers are interchangeable.** Heterogeneous deployment managers and container orchestrators plug in seamlessly behind `ActionProvider` with zero changes to the LangGraph agent.
 
 

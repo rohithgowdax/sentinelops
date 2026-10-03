@@ -38,6 +38,8 @@ class InvestigationStatus(str, Enum):
     DIAGNOSED = "diagnosed"
     INSUFFICIENT_EVIDENCE = "insufficient_evidence"
     INVESTIGATION_FAILED = "investigation_failed"
+    RESOLVED = "resolved"
+    FAILED = "failed"
 
 
 class InvestigationStep(BaseModel):

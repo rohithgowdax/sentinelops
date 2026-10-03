@@ -15,6 +15,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, AsyncIterator, Protocol, runtime_checkable
 
+from pydantic import BaseModel, Field
+
+from sentinelops.domain.models.action import ActionRequest, ActionResult
 from sentinelops.domain.models.events import (
     IncidentCreatedEvent,
     TelemetryReceivedEvent,
@@ -543,4 +546,38 @@ class TelemetryAdapter(Protocol):
         Returns:
             Normalized `TelemetryRecord` domain object.
         """
+        ...
+
+
+class ActionValidationResult(BaseModel):
+    """Result of ActionProvider pre-execution validation."""
+
+    is_valid: bool
+    reason: str
+    target_exists: bool
+    parameters_valid: bool
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+@runtime_checkable
+class ActionProvider(Protocol):
+    """
+    Capability protocol for executing and validating controlled remediation actions.
+    
+    Implementations:
+    - `MockServiceDeploymentProvider`: Simulated microservice deployment lifecycle.
+    - `MockContainerProvider`: Simulated container/pod orchestration.
+    """
+
+    @property
+    def provider_name(self) -> str:
+        """Identifier string for the action provider implementation."""
+        ...
+
+    async def validate(self, request: ActionRequest) -> ActionValidationResult:
+        """Validate target resource existence and action parameter sanity before execution."""
+        ...
+
+    async def execute(self, request: ActionRequest) -> ActionResult:
+        """Execute the validated action idempotently on the infrastructure provider."""
         ...

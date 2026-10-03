@@ -1,0 +1,21 @@
+{
+  "benchmark_id": "sentinelops_remediation_v1",
+  "timestamp": "2026-10-03T16:28:35.560891+00:00",
+  "scenario_count": 20,
+  "categories": [
+    "allow",
+    "requires_approval",
+    "deny",
+    "failed_recovery"
+  ],
+  "invariants_tested": [
+    "zero_direct_execution_by_llm",
+    "deterministic_policy_boundary",
+    "rbac_approval_enforcement",
+    "one_time_approval_consumption",
+    "parameter_tampering_detection",
+    "post_action_telemetry_verification",
+    "bounded_remediation_reinvestigation_loop"
+  ],
+  "execution_mode": "stateful_mock_simulation"
+}

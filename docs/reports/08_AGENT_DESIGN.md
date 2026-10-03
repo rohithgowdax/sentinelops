@@ -174,3 +174,32 @@ The AI Investigation Agent is verified by:
 2. **Graph Execution Tests (`tests/unit/test_investigation_graph.py`):** 4 tests verifying happy-path flow, re-investigation loops, max-iteration termination, and state checkpointing.
 3. **Generalization Contract Tests (`tests/contract/test_investigation_generalization.py`):** Proves AST-level zero provider branching and identical diagnosis semantics across OTel and custom JSON.
 4. **End-to-End Pipeline Integration Tests (`tests/integration/test_orchestrator.py`):** Full loop from Redis incident event to LangGraph, PostgreSQL persistence, and REST API retrieval.
+
+---
+
+## Slice 4: Controlled Remediation & Safety Subtree
+
+In Slice 4, when an `action_provider` is supplied to `create_investigation_graph`, the graph branches from `verify_diagnosis` to the remediation subtree:
+
+```mermaid
+flowchart LR
+    verify_diagnosis --> plan_remediation
+    plan_remediation --> evaluate_policy
+    evaluate_policy -->|allow| execute_action
+    evaluate_policy -->|requires_approval| await_approval
+    evaluate_policy -->|deny| finalize_denied
+    await_approval -->|approved| execute_action
+    await_approval -->|rejected| finalize_denied
+    execute_action --> verify_remediation
+    verify_remediation -->|recovered| finalize_resolved
+    verify_remediation -->|degraded & iter<2| collect_evidence
+    verify_remediation -->|degraded & iter>=2| finalize_failed
+```
+
+### Remediation Nodes:
+- `plan_remediation`: Translates verified diagnosis into canonical `ActionRequest` citing evidence.
+- `evaluate_policy`: Runs deterministic `PolicyEngine.evaluate(request)` against declarative rules.
+- `await_approval`: Suspends workflow using LangGraph native `interrupt()` if policy requires approval.
+- `execute_action`: Revalidates approval token (enforcing one-time use and parameter tampering detection), dispatches to `ActionProvider.execute(request)`.
+- `verify_remediation`: Checks post-action live telemetry against operational thresholds (`http.error_rate < 0.05`, `http.server.duration_p99 < 1.00s`).
+- `finalize_resolved` / `finalize_failed` / `finalize_denied`: Concludes incident lifecycle and records complete audit trail.
