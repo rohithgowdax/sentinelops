@@ -1,0 +1,62 @@
+{
+  "benchmark_id": "sentinelops_mcp_overhead_v1",
+  "timestamp": "2026-10-04T15:23:02.752506+00:00",
+  "iterations_per_tool": 50,
+  "protocol_version": "2026-07-28",
+  "results": {
+    "query_metrics": {
+      "direct": {
+        "mean_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.0,
+        "min_ms": 0.0,
+        "max_ms": 0.0
+      },
+      "mcp": {
+        "mean_ms": 0.022,
+        "p50_ms": 0.009,
+        "p95_ms": 0.014,
+        "min_ms": 0.009,
+        "max_ms": 0.637
+      },
+      "overhead_delta_ms": 0.022,
+      "overhead_multiplier": 22.0
+    },
+    "search_knowledge": {
+      "direct": {
+        "mean_ms": 0.204,
+        "p50_ms": 0.196,
+        "p95_ms": 0.298,
+        "min_ms": 0.186,
+        "max_ms": 0.334
+      },
+      "mcp": {
+        "mean_ms": 0.222,
+        "p50_ms": 0.214,
+        "p95_ms": 0.259,
+        "min_ms": 0.202,
+        "max_ms": 0.415
+      },
+      "overhead_delta_ms": 0.018,
+      "overhead_multiplier": 1.09
+    },
+    "get_service_health": {
+      "direct": {
+        "mean_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.0,
+        "min_ms": 0.0,
+        "max_ms": 0.001
+      },
+      "mcp": {
+        "mean_ms": 0.009,
+        "p50_ms": 0.009,
+        "p95_ms": 0.01,
+        "min_ms": 0.009,
+        "max_ms": 0.023
+      },
+      "overhead_delta_ms": 0.009,
+      "overhead_multiplier": 9.0
+    }
+  }
+}

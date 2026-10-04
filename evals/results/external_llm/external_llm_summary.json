@@ -1,0 +1,10 @@
+{
+  "evaluation_mode": "external_api",
+  "status": "NOT RUN",
+  "model": "gpt-4o-mini",
+  "provider": "external_llm_api",
+  "timestamp": "2026-10-04T15:24:08.459283+00:00",
+  "reason": "External API credentials (SENTINELOPS_LLM_API_KEY or OPENAI_API_KEY) were not detected in the environment. Per strict SentinelOps safety and truthfulness invariants, external metrics are NOT fabricated.",
+  "benchmark_dataset_size": 30,
+  "measured_metrics": null
+}

@@ -425,4 +425,75 @@ Bound remediation attempts using `max_remediation_attempts` (default: 2). If pos
 ### Consequences
 - Guarantees predictable, bounded workflow termination under all failure modes.
 
+---
+
+## ADR-026 — MCP as an Interoperability Layer, Not an Authorization Bypass
+
+### Context
+External agent orchestrators and tools require standardized discovery and execution interfaces (MCP). Directly exposing internal operational primitives via MCP could bypass core security policies.
+
+### Decision
+Treat MCP strictly as an interoperability layer. All mutating calls over MCP must flow through `PolicyEngine` and `ApprovalService`. An MCP server cannot execute actions directly against providers.
+
+### Consequences
+- External orchestrators can interact with SentinelOps via standard JSON-RPC.
+- Policy denials and mandatory approval requirements are strictly enforced across the MCP boundary.
+
+---
+
+## ADR-027 — Adoption of MCP Protocol Revision 2026-07-28
+
+### Context
+MCP protocol standards evolve with varying capabilities. We require stateless context propagation and cacheable discovery.
+
+### Decision
+Implement the MCP specification pegged to the `2026-07-28` revision, supporting explicit `CacheHint` discovery responses and request-scoped `ProtocolMetadata` (`tenant_id`, `actor_id`, `trace_id`).
+
+### Consequences
+- Eliminates multi-hop discovery chatter via client-side caching.
+- Guarantees full auditability and trace context on every protocol interaction.
+
+---
+
+## ADR-028 — OpenTelemetry Observability with Automated Data Sanitization
+
+### Context
+Distributed multi-agent executions require W3C distributed tracing and metric collection, but internal chain-of-thought tokens or API keys must not leak into telemetry streams.
+
+### Decision
+Implement a native OpenTelemetry-compatible `Tracer` and `MetricsCollector` that recursively sanitizes attributes (`[REDACTED_SECRET]`, `[REDACTED_THOUGHT]`) before export.
+
+### Consequences
+- Transparent distributed tracing compliant with W3C standards.
+- Zero risk of secret leakage or unconstrained reasoning traces in public logs.
+
+---
+
+## ADR-029 — AWS Bedrock AgentCore External Gateway & Runtime Adapters
+
+### Context
+To support enterprise deployment on AWS Bedrock AgentCore while maintaining complete core portability, cloud-specific protocols must be isolated.
+
+### Decision
+Implement AWS integrations solely as external perimeter adapters (`AgentCoreGatewayAdapter` and `AgentCoreRuntimeAdapter`). SentinelOps Core contains zero imports of AWS SDKs or boto3.
+
+### Consequences
+- SentinelOps remains 100% cloud-agnostic and runnable in any environment.
+- Cloud perimeter authentication (SigV4/JWT) is cleanly converted to internal canonical actor contexts.
+
+---
+
+## ADR-030 — Honest Benchmark Classification for Unconfigured Cloud APIs
+
+### Context
+Running benchmarks in local or offline environments where external cloud LLMs or AWS credentials are not configured can result in false passes, mock confusion, or fabricated numbers.
+
+### Decision
+Formalize an evaluation status taxonomy: `MEASURED`, `SIMULATED`, and `NOT RUN`. If API keys are absent, external evaluation benchmarks must explicitly record `NOT RUN` and state the missing configuration.
+
+### Consequences
+- Benchmark reporting remains technically defensible and transparent.
+- No false claims of live cloud execution without live credentials.
+
+
 
