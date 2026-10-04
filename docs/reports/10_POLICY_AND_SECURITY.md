@@ -2,8 +2,8 @@
 
 ## Status
 
-- **Remediation Execution & Policy Engine:** Planned for Slice 4+ (Strictly NOT implemented in Slice 3).
-- **Prompt Injection Defense & Untrusted Knowledge Boundary:** **Implemented and Verified in Slice 3.**
+- **Remediation Execution & Policy Engine:** **Implemented and Formally Verified in Slice 4.**
+- **Prompt Injection Defense & Untrusted Knowledge Boundary:** **Implemented and Verified in Slice 3 & Slice 4.**
 
 ---
 

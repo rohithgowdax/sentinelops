@@ -1,6 +1,6 @@
 {
   "benchmark_id": "sentinelops_remediation_v1",
-  "timestamp": "2026-10-03T16:28:35.560891+00:00",
+  "timestamp": "2026-10-04T14:59:47.631327+00:00",
   "scenario_count": 20,
   "categories": [
     "allow",

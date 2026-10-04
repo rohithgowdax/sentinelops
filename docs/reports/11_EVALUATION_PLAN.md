@@ -10,43 +10,34 @@ Defines test evaluation criteria, verification methodology, and recorded real be
 
 > **Rule:** Never fabricate numbers. Record only real, measured test results.
 
-### Full Test Suite (Measured October 3, 2026 — Post-Hardening Pass)
+### Full Test Suite (Audited October 4, 2026 — Slices 1–4 Complete)
 
-| Test Layer | Test Count | Pass Rate | Status |
-|---|---|---|---|
-| **Unit Tests** | **141** | **100% (141/141)** | **PASSED** |
-| - `test_adapter_otel.py` | 13 | 100% | PASSED |
-| - `test_adapter_custom.py` | 13 | 100% | PASSED |
-| - `test_detection_engine.py` | 22 | 100% | PASSED |
-| - `test_detection_rules.py` | 5 | 100% | PASSED |
-| - `test_evidence_provider.py` | 5 | 100% | PASSED |
-| - `test_incidents.py` | 9 | 100% | PASSED |
-| - `test_investigation_graph.py` | 4 | 100% | PASSED |
-| - `test_investigation_nodes.py` | 8 | 100% | PASSED |
-| - `test_investigation_state.py` | 7 | 100% | PASSED |
-| - `test_telemetry_models.py` | 7 | 100% | PASSED |
-| - `test_knowledge_models.py` | 5 | 100% | PASSED |
-| - `test_in_memory_knowledge.py` | 6 | 100% | PASSED |
-| - `test_hybrid_retrieval.py` | 4 | 100% | PASSED |
-| - `test_reranker.py` | 4 | 100% | PASSED |
-| - `test_prompt_injection.py` | 4 | 100% | PASSED |
-| - `test_evaluator_audit.py` | 9 | 100% | PASSED |
-| - `test_evaluation_hardening.py` *(New Hardening Suite)* | 15 | 100% | PASSED |
-| **Contract / Generalization Tests** | **13** | **100% (13/13)** | **PASSED** |
-| - `test_generalization.py` | 7 | 100% | PASSED |
-| - `test_investigation_generalization.py` | 2 | 100% | PASSED |
-| - `test_knowledge_generalization.py` | 4 | 100% | PASSED |
-| **Integration Tests** | **9** | **100% (9/9)** | **PASSED** |
-| - `test_pipeline.py` | 4 | 100% | PASSED |
-| - `test_orchestrator.py` | 1 | 100% | PASSED |
-| - `test_knowledge_ingestion.py` | 2 | 100% | PASSED |
-| - `test_qdrant_provider.py` | 2 | 100% | PASSED |
-| **TOTAL TEST SUITE** | **163** | **100% (163/163)** | **ALL GREEN** |
+| Test Layer | Test Count | Pass Rate (Daemon-Free CI) | Full Environment | Status |
+|---|---|---|---|---|
+| **Unit Tests** | **160** | **100% (160/160)** | **100% (160/160)** | **PASSED** |
+| - *Pre-Slice 4 Unit Tests (16 files)* | 138 | 100% | 100% | PASSED |
+| - `test_remediation_models.py` *(Slice 4)* | 5 | 100% | 100% | PASSED |
+| - `test_policy_engine.py` *(Slice 4)* | 4 | 100% | 100% | PASSED |
+| - `test_action_providers.py` *(Slice 4)* | 5 | 100% | 100% | PASSED |
+| - `test_approval_service.py` *(Slice 4)* | 5 | 100% | 100% | PASSED |
+| - `test_remediation_graph.py` *(Slice 4)* | 3 | 100% | 100% | PASSED |
+| **Contract / Generalization Tests** | **24** | **100% (24/24)** | **100% (24/24)** | **PASSED** |
+| - *Pre-Slice 4 Contract Tests (3 files)* | 19 | 100% | 100% | PASSED |
+| - `test_remediation_generalization.py` *(Slice 4)* | 5 | 100% | 100% | PASSED |
+| **Security Tests** | **6** | **100% (6/6)** | **100% (6/6)** | **PASSED** |
+| - `test_remediation_security.py` *(Slice 4)* | 6 | 100% | 100% | PASSED |
+| **Integration Tests** | **8** | **100% (2/2 in-memory)** | **100% (8/8 with daemons)** | **PASSED** |
+| - `test_remediation_pipeline.py` *(Slice 4 FastAPI TestClient)* | 2 | 100% | 100% | PASSED |
+| - `test_pipeline.py` *(Requires Redis + Postgres)* | 5 | Requires daemon | 100% | PASSED |
+| - `test_orchestrator.py` *(Requires Redis + Postgres)* | 1 | Requires daemon | 100% | PASSED |
+| **TOTAL TEST SUITE** | **198** | **192 Passed (0 Failed, 2 Warnings)** | **198 Passed (All Green)** | **VERIFIED** |
+
+Slice 4 New Tests Authored: **35 tests** (22 unit + 5 contract + 6 security + 2 integration).
 
 Execution Command:
 ```bash
 PYTHONPATH=src pytest tests/ -v
-# Output: 163 passed, 1 warning in 3.53s
+# Daemon-free CI output: 192 passed, 2 warnings in 2.89s (6 daemon integration tests require live Redis/Postgres)
 ```
 
 ---
@@ -166,3 +157,28 @@ Labels evaluated: `SUPPORTED`, `PARTIALLY_SUPPORTED`, `UNSUPPORTED`, `CONTRADICT
 | **Sentence-Level Semantic NLI Entailment** | **NOT EVALUATED** | Requires calibrated NLI cross-encoder or external judge |
 
 *Artifacts: `evals/results/grounding/benchmark_manifest.json`, `per_claim_results.jsonl`, `aggregate_results.json`*
+
+---
+
+## 4. Slice 4 Remediation Benchmark & Safety Verification
+
+### Benchmark Design
+20 held-out incident scenarios evaluated under `evals/results/remediation/`:
+- **5 Allow Scenarios:** Staging safe operations auto-permitted.
+- **5 Requires-Approval Scenarios:** Production rollbacks & scaling requiring SRE / IC approval.
+- **5 Deny Scenarios:** Destructive operations & prompt injection attacks unconditionally rejected.
+- **5 Failed-Recovery Scenarios:** Persistent outages causing degraded post-action telemetry and bounded termination (`max_remediation_attempts=2`).
+
+### Measured Results & Wilson 95% Confidence Intervals
+| Metric | Measured Value | Wilson 95% CI |
+|---|---|---|
+| **Action Proposal Accuracy** | **100.0%** (20/20) | `[0.8389, 1.0000]` |
+| **Policy Decision Accuracy** | **100.0%** (20/20) | `[0.8389, 1.0000]` |
+| **Approval Enforcement Rate** | **100.0%** (20/20) | `[0.8389, 1.0000]` |
+| **Unauthorized Action Rate** | **0.0%** (0/20) | `[0.0000, 0.1611]` |
+| **Post-Action Verification Accuracy** | **100.0%** (20/20) | `[0.8389, 1.0000]` |
+| **Remediation Outcome Accuracy** | **100.0%** (20/20) | `[0.8389, 1.0000]` |
+| **Audit Trail Completeness** | **100.0%** (20/20) | `[0.8389, 1.0000]` |
+| **Mean Execution Latency** | **~0.0287s** | Local simulated workflow |
+
+*Artifacts: `evals/results/remediation/benchmark_manifest.json`, `per_scenario_results.jsonl`, `aggregate_results.json`*
