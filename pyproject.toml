@@ -4,8 +4,8 @@ version = "0.1.0"
 description = "SentinelOps – AI-native incident intelligence and controlled remediation platform (POC slice 1)"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Proprietary" }
-authors = [{ name = "SentinelOps Team" }]
+license = { text = "MIT" }
+authors = [{ name = "Rohith Gowda R" }]
 
 dependencies = [
     "pydantic>=2.7,<3",

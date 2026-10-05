@@ -1,33 +1,70 @@
-# Python bytecode and caches
+# Python bytecode, caches, and compiled extensions
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
 
-# Virtual environment
+# Packaging and distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
+
+# Virtual environments
 .venv/
 venv/
 env/
+ENV/
+.python-version
 
-# Testing and coverage
+# Testing, coverage, and static analysis
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
 .coverage
 .coverage.*
 htmlcov/
+.tox/
+.nox/
 
-# Environment and secrets
+# Environment files and credentials
 .env
+.env.*
+!.env.example
 *.pem
 *.key
+*.crt
+*.cert
 
-# IDE
+# IDE and editor configurations
 .vscode/
 .idea/
 *.swp
 *.swo
-.DS_Store
+*~
 
-# Logs and runtime data
+# Operating system files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Storage volumes and local runtime data
+postgres_data/
+qdrant_data/
+data/
+scratch/
+
+# Logs and temporary files
 *.log
 logs/
 tmp/
+temp/
+
+# Prompt and scratch generation artifacts
+SentinelOps_README_Generation_Prompt.md
+*_Prompt.md
