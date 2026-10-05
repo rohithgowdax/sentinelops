@@ -1,0 +1,74 @@
+{
+  "benchmark_id": "slice6_mcp_http_transport_v1",
+  "timestamp": "2026-10-05T06:02:00.380457+00:00",
+  "sample_count": 50,
+  "warmup_count": 5,
+  "transports_measured": [
+    "direct_provider",
+    "local_mcp_dispatch",
+    "mcp_over_http",
+    "mcp_over_http_auth"
+  ],
+  "results": {
+    "query_metrics": {
+      "direct_provider": {
+        "mean_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.001,
+        "p99_ms": 0.001,
+        "min_ms": 0.0,
+        "max_ms": 0.001
+      },
+      "local_mcp_dispatch": {
+        "mean_ms": 0.02,
+        "p50_ms": 0.017,
+        "p95_ms": 0.032,
+        "p99_ms": 0.079,
+        "min_ms": 0.014,
+        "max_ms": 0.079
+      },
+      "mcp_over_http": {
+        "mean_ms": 0.498,
+        "p50_ms": 0.282,
+        "p95_ms": 0.531,
+        "p99_ms": 9.856,
+        "min_ms": 0.232,
+        "max_ms": 9.856
+      },
+      "mcp_over_http_auth": {
+        "mean_ms": 0.33,
+        "p50_ms": 0.281,
+        "p95_ms": 0.622,
+        "p99_ms": 1.016,
+        "min_ms": 0.234,
+        "max_ms": 1.016
+      }
+    },
+    "search_knowledge": {
+      "direct_provider": {
+        "mean_ms": 0.22,
+        "p50_ms": 0.212,
+        "p95_ms": 0.248,
+        "p99_ms": 0.487,
+        "min_ms": 0.209,
+        "max_ms": 0.487
+      },
+      "local_mcp_dispatch": {
+        "mean_ms": 0.239,
+        "p50_ms": 0.234,
+        "p95_ms": 0.28,
+        "p99_ms": 0.284,
+        "min_ms": 0.23,
+        "max_ms": 0.284
+      },
+      "mcp_over_http": {
+        "mean_ms": 0.535,
+        "p50_ms": 0.512,
+        "p95_ms": 0.627,
+        "p99_ms": 1.246,
+        "min_ms": 0.488,
+        "max_ms": 1.246
+      }
+    }
+  }
+}

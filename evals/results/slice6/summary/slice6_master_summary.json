@@ -1,0 +1,14 @@
+{
+  "benchmark_id": "slice6_master_summary",
+  "timestamp": "2026-10-05T06:02:00.381272+00:00",
+  "commit": "bcb3417",
+  "evaluation_classifications": {
+    "mcp_http_transport": "MEASURED",
+    "observability_tracing": "MEASURED",
+    "fault_injection_resilience": "MEASURED",
+    "remediation_safety": "MEASURED",
+    "external_llm_api": "NOT RUN (Unconfigured)",
+    "aws_agentcore_live": "NOT RUN (Unconfigured)"
+  },
+  "verdict": "PARTIAL PASS (Offline & Transport Measured, Cloud APIs Honestly Classified as NOT RUN)"
+}

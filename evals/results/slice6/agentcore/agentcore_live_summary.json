@@ -1,0 +1,8 @@
+{
+  "benchmark_id": "slice6_agentcore_live_eval",
+  "timestamp": "2026-10-05T06:02:00.380785+00:00",
+  "status": "NOT RUN",
+  "reason": "AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY) not found in environment. Live cloud calls were not executed.",
+  "gateway_status": "OFFLINE_ADAPTER_VERIFIED",
+  "runtime_status": "OFFLINE_ADAPTER_VERIFIED"
+}

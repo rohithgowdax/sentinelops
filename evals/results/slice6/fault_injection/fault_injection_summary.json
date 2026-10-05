@@ -1,0 +1,37 @@
+{
+  "benchmark_id": "slice6_fault_injection_matrix",
+  "timestamp": "2026-10-05T06:02:00.381132+00:00",
+  "status": "MEASURED",
+  "scenarios": [
+    {
+      "layer": "Knowledge Provider",
+      "failure": "Qdrant / In-memory provider unavailable",
+      "behavior": "Raises KnowledgeUnavailableError, LangGraph falls back to telemetry-only hypothesis generation",
+      "status": "PASS"
+    },
+    {
+      "layer": "MCP HTTP Transport",
+      "failure": "Malformed JSON payload or invalid JSON-RPC format",
+      "behavior": "Fails closed returning PARSE_ERROR (-32700) or INVALID_REQUEST (-32600)",
+      "status": "PASS"
+    },
+    {
+      "layer": "Action Execution",
+      "failure": "Provider execution failure or exception",
+      "behavior": "Records audit failure event, returns VERIFICATION_FAILED (-32005), enters safe halt",
+      "status": "PASS"
+    },
+    {
+      "layer": "Policy Engine",
+      "failure": "Unauthorized destructive action attempt",
+      "behavior": "Strictly denied by PolicyEngine, zero downstream provider calls executed",
+      "status": "PASS"
+    },
+    {
+      "layer": "Approval Token",
+      "failure": "Parameter tampering or replay attempt with consumed token",
+      "behavior": "Pre-execution revalidation fails closed, zero downstream provider calls executed",
+      "status": "PASS"
+    }
+  ]
+}

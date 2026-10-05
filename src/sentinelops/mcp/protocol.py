@@ -163,7 +163,7 @@ class MCPResponse(BaseModel):
     """Standard JSON-RPC 2.0 Response with 2026-07-28 Protocol Metadata."""
 
     jsonrpc: str = Field(default="2.0")
-    id: str | int = Field(...)
+    id: str | int | None = Field(default=None)
     result: Any | None = Field(default=None)
     error: MCPError | None = Field(default=None)
     metadata: ProtocolMetadata = Field(default_factory=ProtocolMetadata)
