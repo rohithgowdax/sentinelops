@@ -64,14 +64,3 @@ scratch/
 logs/
 tmp/
 temp/
-
-# Prompt, scratch, and instruction generation artifacts
-SentinelOps_README_Generation_Prompt.md
-*_Prompt.md
-*_prompt.md
-*Prompt*.md
-*prompt*.md
-*.prompt
-*.prompts
-prompt/
-prompts/
