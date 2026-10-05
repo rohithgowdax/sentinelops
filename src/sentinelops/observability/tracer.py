@@ -26,9 +26,16 @@ logger = logging.getLogger(__name__)
 
 # Patterns for secret redaction
 SENSITIVE_KEY_PATTERN = re.compile(
-    r"(password|token|secret|authorization|api_key|private_key|credentials|cookie|bearer|thought)",
+    r"(password|token|secret|authorization|api_key|private_key|credentials|cookie|bearer|thought|scratchpad|raw_cot)",
     re.IGNORECASE,
 )
+
+# Value patterns for high-entropy / sensitive strings
+VALUE_SECRET_PATTERNS = [
+    re.compile(r"AKIA[0-9A-Z]{16}"),  # AWS Access Key ID
+    re.compile(r"bearer\s+[a-zA-Z0-9_\-\.]{15,}", re.IGNORECASE),  # Bearer tokens
+    re.compile(r"sk-[a-zA-Z0-9_\-]{20,}"),  # OpenAI/standard API keys
+]
 
 
 def generate_trace_id() -> str:
@@ -41,18 +48,36 @@ def generate_span_id() -> str:
     return secrets.token_hex(8)
 
 
+def _sanitize_string_value(val: str) -> str:
+    res = val
+    for pat in VALUE_SECRET_PATTERNS:
+        res = pat.sub("[REDACTED_SECRET]", res)
+    return res
+
+
 def sanitize_attributes(attrs: dict[str, Any]) -> dict[str, Any]:
     """Recursively scrub sensitive keys and protect privacy in telemetry."""
     sanitized: dict[str, Any] = {}
     for k, v in attrs.items():
         if SENSITIVE_KEY_PATTERN.search(k):
-            sanitized[k] = "[REDACTED]"
+            if re.search(r"(thought|scratchpad|raw_cot)", k, re.IGNORECASE):
+                sanitized[k] = "[REDACTED_THOUGHT]"
+            else:
+                sanitized[k] = "[REDACTED_SECRET]"
         elif isinstance(v, dict):
             sanitized[k] = sanitize_attributes(v)
-        elif isinstance(v, (str, int, float, bool)) or v is None:
+        elif isinstance(v, list):
+            sanitized[k] = [
+                sanitize_attributes(item) if isinstance(item, dict)
+                else (_sanitize_string_value(item) if isinstance(item, str) else item)
+                for item in v
+            ]
+        elif isinstance(v, str):
+            sanitized[k] = _sanitize_string_value(v)
+        elif isinstance(v, (int, float, bool)) or v is None:
             sanitized[k] = v
         else:
-            sanitized[k] = str(v)
+            sanitized[k] = _sanitize_string_value(str(v))
     return sanitized
 
 

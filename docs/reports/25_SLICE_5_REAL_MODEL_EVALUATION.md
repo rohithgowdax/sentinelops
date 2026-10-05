@@ -40,7 +40,10 @@ When run without live API keys:
 
 ## 3. MCP Performance Overhead Benchmark (`run_mcp_perf_eval.py`)
 
-A formal comparative benchmark was executed measuring latency for direct method invocation vs. MCP JSON-RPC protocol handling across 50 iterations:
+A formal comparative benchmark was executed measuring latency for direct method invocation vs. local in-process MCP JSON-RPC protocol handling across 50 iterations:
+
+> [!NOTE]
+> This benchmark measures **local in-process MCP dispatch overhead** (serialization, schema validation, context mapping). It does **not** simulate or claim production WAN/HTTP network transit times.
 
 ```json
 {
@@ -68,4 +71,4 @@ A formal comparative benchmark was executed measuring latency for direct method 
 
 ### Analysis:
 - The maximum protocol overhead observed is **0.0219 ms** (21.9 microseconds).
-- Serialization, schema validation, and context propagation have virtually zero impact on operational response times.
+- Serialization, schema validation, and context propagation have virtually zero impact on operational response times in-process.

@@ -30,6 +30,9 @@ class TestObservabilityTracer:
             "api_key": "sk-proj-abc",
             "auth_token": "bearer-xyz",
             "chain_of_thought": "hidden thoughts",
+            "scratchpad": "reasoning steps",
+            "raw_cot": "internal tokens",
+            "aws_header": "Header contains AKIAIOSFODNN7EXAMPLE key",
             "nested": {
                 "user_token": "secret-nested",
                 "normal_val": 42,
@@ -37,11 +40,15 @@ class TestObservabilityTracer:
         }
         sanitized = sanitize_attributes(raw)
         assert sanitized["service.name"] == "payments-service"
-        assert sanitized["db.password"] == "[REDACTED]"
-        assert sanitized["api_key"] == "[REDACTED]"
-        assert sanitized["auth_token"] == "[REDACTED]"
-        assert sanitized["chain_of_thought"] == "[REDACTED]"
-        assert sanitized["nested"]["user_token"] == "[REDACTED]"
+        assert sanitized["db.password"] == "[REDACTED_SECRET]"
+        assert sanitized["api_key"] == "[REDACTED_SECRET]"
+        assert sanitized["auth_token"] == "[REDACTED_SECRET]"
+        assert sanitized["chain_of_thought"] == "[REDACTED_THOUGHT]"
+        assert sanitized["scratchpad"] == "[REDACTED_THOUGHT]"
+        assert sanitized["raw_cot"] == "[REDACTED_THOUGHT]"
+        assert "[REDACTED_SECRET]" in sanitized["aws_header"]
+        assert "AKIAIOSFODNN7EXAMPLE" not in sanitized["aws_header"]
+        assert sanitized["nested"]["user_token"] == "[REDACTED_SECRET]"
         assert sanitized["nested"]["normal_val"] == 42
 
     def test_tracer_span_lifecycle_and_duration(self) -> None:

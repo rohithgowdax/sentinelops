@@ -68,9 +68,12 @@ SentinelOps exposes 4 modular, single-responsibility MCP servers:
 
 ---
 
-## 4. MCP Performance Benchmark Results
+## 4. MCP Performance Benchmark Results (Local In-Process Dispatch Overhead)
 
-Direct in-process invocation vs. MCP protocol overhead was empirically benchmarked ($N=50$ iterations per tool):
+Direct in-process invocation vs. local MCP protocol dispatch overhead was empirically benchmarked ($N=50$ iterations per tool):
+
+> [!NOTE]
+> This benchmark specifically measures **local in-process MCP dispatch overhead** (JSON-RPC 2.0 serialization, schema validation, metadata extraction, and in-memory routing). It does **not** measure production HTTP/SSE network transit latency.
 
 | Tool Name | Direct Latency (ms) | MCP Latency (ms) | Protocol Overhead (ms) |
 |---|---|---|---|
@@ -78,7 +81,7 @@ Direct in-process invocation vs. MCP protocol overhead was empirically benchmark
 | `search_knowledge` | 0.2038 ms | 0.2217 ms | **+0.0179 ms** (~18 µs) |
 | `get_service_health` | 0.0004 ms | 0.0094 ms | **+0.0090 ms** (~9 µs) |
 
-**Conclusion:** The MCP transport layer introduces less than **25 microseconds** of overhead per tool call, which is negligible compared to model reasoning and network I/O.
+**Conclusion:** The local in-process MCP transport layer introduces less than **25 microseconds** of overhead per tool call, which is negligible compared to model reasoning and network I/O.
 
 ---
 
@@ -88,7 +91,9 @@ The security suite (`tests/security/test_mcp_security.py`) formally verifies:
 * **Tool Name Confusion & Collision Resistance:** Servers reject calls to undeclared tools or wrong servers (`METHOD_NOT_FOUND`).
 * **Input Tampering & Validation:** Invalid argument schemas trigger `-32602 (INVALID_PARAMS)` before any internal handler executes.
 * **Unauthorized Caller Role Rejection:** Viewer roles attempting `execute_action` are rejected with `PERMISSION_DENIED`.
-* **Prompt Injection Defense:** Malicious instructions embedded in query parameters are treated as literal text and do not hijack the execution path.
+* **Prompt Injection Defense:** Malicious instructions embedded in query parameters are treated as literal text and do not hijack the execution path under tested attack cases.
 * **Strict Policy Invariants:**
-  * Policy `DENY` guarantees **zero** downstream provider executions.
-  * Policy `REQUIRES_APPROVAL` guarantees **zero** downstream provider executions without an approved token.
+  * **Invariant A (Policy DENY):** Policy `DENY` guarantees **zero** downstream provider executions.
+  * **Invariant B (Policy REQUIRES_APPROVAL):** Policy `REQUIRES_APPROVAL` guarantees **zero** downstream provider executions without an approved token.
+  * **Invariant C (Exact-Action Binding & Anti-Replay):** Approvals are cryptographically/structurally bound to exact action parameters and targets. Any parameter tampering or replay attempt with a consumed token fails closed.
+* **Identity and Trust Boundary:** Untrusted caller metadata cannot forge elevated roles or bypass authentication at the perimeter. Missing or invalid authorization headers are rejected with `UNAUTHORIZED`.

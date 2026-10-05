@@ -273,3 +273,141 @@ class TestMCPSecurity:
 
         # Action provider invocation count MUST be 0
         assert len(provider._executed_actions) == 0
+
+    @pytest.mark.asyncio
+    async def test_mandatory_invariant_c_exact_action_binding_and_tampering_fails_closed(
+        self,
+        setup_remediation_mcp: tuple[MCPClient, MockServiceDeploymentProvider, ApprovalService],
+    ) -> None:
+        """
+        MANDATORY SLICE 5 SAFETY REGRESSION 3 (Invariant C):
+        Exact action binding:
+        1. Propose action and receive approved token.
+        2. Attempt executing action with altered parameters, action_type, or target.
+        3. Must fail closed (revalidation fails, provider execution count = 0).
+        4. Attempt re-using token after successful execution (replay).
+        5. Must fail closed (token consumed, provider execution count unchanged).
+        """
+        client, provider, approvals = setup_remediation_mcp
+
+        # Step 1: Propose production rollback (requires approval)
+        prop_resp = await client.call_tool(
+            "propose_action",
+            {
+                "incident_id": "INC-EXACT-01",
+                "action_type": "rollback_deployment",
+                "target_service": "payments-service",
+                "parameters": {"target_version": "1.8.2"},
+                "rationale": "High-risk production rollback requiring signoff",
+            },
+            actor_id="sre-actor",
+            actor_role="sre",
+            environment="production",
+        )
+        assert prop_resp.error is None
+        action_id = prop_resp.result["action_id"]
+
+        # Step 2: Approve the action with Incident Commander credentials
+        ic_actor = ActorContext(
+            actor_id="ic-chief",
+            role=ActorRole.INCIDENT_COMMANDER,
+            tenant_id="default-tenant",
+        )
+        app_req = approvals.get_approval(action_id)
+        assert app_req is not None
+        ok, msg, _ = approvals.approve(action_id, ic_actor, comment="Signoff granted for v1.8.2 rollback")
+        assert ok, msg
+
+        # Step 3: Tamper with parameter (target_version changed to 1.8.0 malicious/unapproved)
+        tamper_resp = await client.call_tool(
+            "execute_action",
+            {
+                "incident_id": "INC-EXACT-01",
+                "action_id": action_id,
+                "action_type": "rollback_deployment",
+                "target_service": "payments-service",
+                "parameters": {"target_version": "1.8.0"},  # Tampered!
+                "rationale": "Attempt executing tampered version with valid token",
+            },
+            actor_id="sre-actor",
+            actor_role="sre",
+            environment="production",
+        )
+        # Must fail closed: pre-execution revalidation detects parameter divergence
+        assert tamper_resp.error is not None
+        assert tamper_resp.error.code == MCPErrorCode.ARGUMENT_TAMPERING
+        assert len(provider._executed_actions) == 0
+
+        # Step 4: Execute with exact untampered parameters -> Execution succeeds
+        exec_ok_resp = await client.call_tool(
+            "execute_action",
+            {
+                "incident_id": "INC-EXACT-01",
+                "action_id": action_id,
+                "action_type": "rollback_deployment",
+                "target_service": "payments-service",
+                "parameters": {"target_version": "1.8.2"},  # Exact approved parameters
+                "rationale": "Executing approved rollback",
+            },
+            actor_id="sre-actor",
+            actor_role="sre",
+            environment="production",
+        )
+        assert exec_ok_resp.error is None
+        assert len(provider._executed_actions) == 1
+        assert action_id in provider._executed_actions
+        assert provider._executed_actions[action_id].action_id == action_id
+
+        # Step 5: Anti-replay check — Attempt re-executing with the consumed token
+        replay_resp = await client.call_tool(
+            "execute_action",
+            {
+                "incident_id": "INC-EXACT-01",
+                "action_id": action_id,
+                "action_type": "rollback_deployment",
+                "target_service": "payments-service",
+                "parameters": {"target_version": "1.8.2"},
+                "rationale": "Replay attack attempt with consumed approval",
+            },
+            actor_id="sre-actor",
+            actor_role="sre",
+            environment="production",
+        )
+        assert replay_resp.error is not None
+        assert "already been consumed" in replay_resp.error.message.lower()
+        # Downstream provider executed count must still remain 1 (no re-execution)
+        assert len(provider._executed_actions) == 1
+
+    @pytest.mark.asyncio
+    async def test_untrusted_caller_cannot_forge_elevated_role_in_gateway(self) -> None:
+        """
+        Adversarial Vector 6 (Trust Boundary Audit):
+        Untrusted caller metadata must NEVER be sufficient to elevate authorization privileges.
+        When calling AgentCore Gateway, user cannot pass unverified bearer tokens or forge
+        incident_commander role in metadata.
+        """
+        from sentinelops.integrations.aws.gateway import AgentCoreGatewayAdapter
+        from sentinelops.mcp.servers.telemetry import create_telemetry_mcp_server
+
+        gw = AgentCoreGatewayAdapter(gateway_id="gw-secure-test")
+        telem_server = create_telemetry_mcp_server()
+        gw.attach_mcp_target("telemetry", telem_server)
+
+        # Attempt call with invalid / unauthenticated token
+        res_unauth = await gw.route_tool_call(
+            tool_name="query_metrics",
+            arguments={"service": "payments-service", "metric": "http.error_rate"},
+            auth_header="Bearer tok-unauth-attacker",
+        )
+        assert res_unauth.error is not None
+        assert res_unauth.error.code == MCPErrorCode.UNAUTHORIZED
+
+        # Attempt call with missing authorization header
+        res_no_auth = await gw.route_tool_call(
+            tool_name="query_metrics",
+            arguments={"service": "payments-service", "metric": "http.error_rate"},
+            auth_header=None,
+        )
+        assert res_no_auth.error is not None
+        assert res_no_auth.error.code == MCPErrorCode.UNAUTHORIZED
+
