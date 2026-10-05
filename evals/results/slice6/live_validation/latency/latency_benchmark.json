@@ -1,0 +1,67 @@
+{
+  "benchmark_id": "slice6_live_transport_latency",
+  "timestamp": "2026-10-05T10:12:54.722429+00:00",
+  "iterations": 50,
+  "results": {
+    "query_metrics": {
+      "direct_provider": {
+        "mean_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.001,
+        "p99_ms": 0.001,
+        "min_ms": 0.0,
+        "max_ms": 0.001
+      },
+      "local_mcp_dispatch": {
+        "mean_ms": 0.02,
+        "p50_ms": 0.019,
+        "p95_ms": 0.029,
+        "p99_ms": 0.042,
+        "min_ms": 0.015,
+        "max_ms": 0.042
+      },
+      "mcp_over_http": {
+        "mean_ms": 0.313,
+        "p50_ms": 0.293,
+        "p95_ms": 0.442,
+        "p99_ms": 1.053,
+        "min_ms": 0.227,
+        "max_ms": 1.053
+      },
+      "mcp_over_http_auth": {
+        "mean_ms": 1.114,
+        "p50_ms": 0.29,
+        "p95_ms": 0.597,
+        "p99_ms": 39.856,
+        "min_ms": 0.229,
+        "max_ms": 39.856
+      }
+    },
+    "search_knowledge": {
+      "direct_provider": {
+        "mean_ms": 0.268,
+        "p50_ms": 0.234,
+        "p95_ms": 0.471,
+        "p99_ms": 0.738,
+        "min_ms": 0.211,
+        "max_ms": 0.738
+      },
+      "local_mcp_dispatch": {
+        "mean_ms": 0.294,
+        "p50_ms": 0.247,
+        "p95_ms": 0.37,
+        "p99_ms": 1.629,
+        "min_ms": 0.227,
+        "max_ms": 1.629
+      },
+      "mcp_over_http": {
+        "mean_ms": 0.655,
+        "p50_ms": 0.587,
+        "p95_ms": 0.958,
+        "p99_ms": 2.69,
+        "min_ms": 0.47,
+        "max_ms": 2.69
+      }
+    }
+  }
+}

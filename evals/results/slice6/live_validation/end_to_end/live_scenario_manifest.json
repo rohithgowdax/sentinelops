@@ -1,0 +1,13 @@
+{
+  "benchmark_id": "slice6_live_end_to_end_scenario",
+  "timestamp": "2026-10-05T10:12:54.726428+00:00",
+  "incident_id": "INC-LIVE-PROD-20261005",
+  "trace_id": "37d800df2dff13eedf5158265c23f285",
+  "action_id": "ACT-e5c4173e",
+  "approval_id": "APP-e5d97262",
+  "transport": "HTTP (JSON-RPC 2.0)",
+  "remediation_status": "resolved",
+  "post_action_verification": "SUCCESS",
+  "premature_execution_prevented": true,
+  "trace_correlation_rate": 1.0
+}

@@ -1,0 +1,19 @@
+{
+  "milestone": "Slice 6 Live External Validation Baseline",
+  "timestamp": "2026-10-05T10:11:00.000000+00:00",
+  "baseline_commit": "668603b",
+  "baseline_test_count": 236,
+  "baseline_passed": 236,
+  "baseline_failed": 0,
+  "baseline_skipped": 1,
+  "baseline_deselected": 6,
+  "baseline_warnings": 2,
+  "python_version": "3.13.0",
+  "environment_preflight": {
+    "external_llm_credentials_present": false,
+    "aws_credentials_present": false,
+    "aws_profile_present": false,
+    "aws_credentials_directory_present": false
+  },
+  "safety_invariants_status": "ALL_PASSING"
+}

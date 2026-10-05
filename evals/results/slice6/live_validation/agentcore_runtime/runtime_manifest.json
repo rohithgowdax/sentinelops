@@ -1,0 +1,11 @@
+{
+  "benchmark_id": "slice6_live_agentcore_eval",
+  "timestamp": "2026-10-05T10:12:54.563912+00:00",
+  "status": "NOT RUN",
+  "reason": "AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY) not present in environment. Cloud resources cannot be contacted.",
+  "account_id": null,
+  "region": null,
+  "gateway_live_status": "NOT RUN",
+  "runtime_live_status": "NOT RUN",
+  "offline_adapter_status": "VERIFIED"
+}

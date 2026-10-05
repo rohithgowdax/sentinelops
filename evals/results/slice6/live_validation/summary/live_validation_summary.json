@@ -1,0 +1,20 @@
+{
+  "benchmark_id": "slice6_live_validation_master",
+  "timestamp": "2026-10-05T10:12:54.726596+00:00",
+  "commit": "668603b",
+  "subsystem_status": {
+    "external_llm": "NOT RUN (Unconfigured)",
+    "mcp_http_transport": "MEASURED",
+    "agentcore_gateway": "NOT RUN (Unconfigured)",
+    "agentcore_runtime": "NOT RUN (Unconfigured)",
+    "opentelemetry": "MEASURED (100% Correlation)",
+    "fault_injection": "PASS",
+    "security": "PASS",
+    "remediation_safety": "PASS",
+    "end_to_end_lifecycle": "PASS"
+  },
+  "transport_latency_p50_ms": 0.293,
+  "transport_latency_p95_ms": 0.442,
+  "transport_latency_p99_ms": 1.053,
+  "final_verdict": "PARTIAL PASS"
+}

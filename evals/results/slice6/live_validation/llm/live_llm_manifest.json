@@ -1,0 +1,11 @@
+{
+  "benchmark_id": "slice6_live_llm_eval",
+  "timestamp": "2026-10-05T10:12:54.563121+00:00",
+  "status": "NOT RUN",
+  "reason": "SENTINELOPS_LLM_API_KEY and OPENAI_API_KEY not present in environment. Per strict truthfulness policy, real external metrics are NOT fabricated.",
+  "provider": "unconfigured",
+  "model": "gpt-4o-mini",
+  "accuracy": null,
+  "latency": null,
+  "cost": null
+}

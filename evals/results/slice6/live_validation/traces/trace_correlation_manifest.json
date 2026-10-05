@@ -1,0 +1,13 @@
+{
+  "benchmark_id": "slice6_live_trace_audit",
+  "timestamp": "2026-10-05T10:12:54.726159+00:00",
+  "trace_id": "37d800df2dff13eedf5158265c23f285",
+  "incident_id": "INC-LIVE-PROD-20261005",
+  "action_id": "ACT-e5c4173e",
+  "approval_id": "APP-e5d97262",
+  "total_spans": 7,
+  "correlated_spans": 7,
+  "trace_correlation_rate": 1.0,
+  "secret_redaction_verified": true,
+  "thought_redaction_verified": true
+}
